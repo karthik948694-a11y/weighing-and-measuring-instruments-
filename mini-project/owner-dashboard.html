@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seller / Business Owner Dashboard | Legal Metrology</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/tailwind-config.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-50 text-slate-800">
+
+  <div id="navbar-container"></div>
+
+  <main class="flex-1 pb-16">
+    <!-- Dashboard Header -->
+    <div class="bg-gradient-to-r from-navy via-navy-light to-slate-900 text-white py-8 border-b border-navy-light shadow-md">
+      <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <div class="inline-flex items-center gap-2 bg-gold/20 text-gold text-xs font-semibold px-2.5 py-0.5 rounded-full mb-1">
+            <span>🏭 Commercial Business Dashboard</span>
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-white">
+            Welcome, <span id="ownerDisplayName" class="text-gold">Trader</span>
+          </h1>
+          <p id="ownerShopDetails" class="text-xs text-slate-300 mt-1"></p>
+        </div>
+        <div>
+          <button type="button" id="openNewAppBtn"
+            class="bg-gold hover:bg-gold-light text-navy font-bold px-5 py-2.5 rounded-xl text-xs sm:text-sm transition-all shadow-md flex items-center gap-2 hover:-translate-y-0.5">
+            <span>➕ Register New Instrument</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="max-w-6xl mx-auto px-4 mt-8 space-y-8">
+
+      <!-- Status Summary Cards (Color-Coded) -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <!-- Green Card -->
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 indicator-border-green">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Valid</span>
+            <span class="text-lg">🟢</span>
+          </div>
+          <div id="countGreen" class="text-2xl sm:text-3xl font-extrabold text-green-700 mt-2">0</div>
+          <p class="text-[11px] text-slate-500 mt-1">> 30 days remaining</p>
+        </div>
+
+        <!-- Yellow Card -->
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 indicator-border-yellow">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Due Soon</span>
+            <span class="text-lg">🟡</span>
+          </div>
+          <div id="countYellow" class="text-2xl sm:text-3xl font-extrabold text-amber-600 mt-2">0</div>
+          <p class="text-[11px] text-amber-700 mt-1">Within 30 day window</p>
+        </div>
+
+        <!-- Red Card -->
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 indicator-border-red">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Expired</span>
+            <span class="text-lg">🔴</span>
+          </div>
+          <div id="countRed" class="text-2xl sm:text-3xl font-extrabold text-red-600 mt-2">0</div>
+          <p class="text-[11px] text-red-600 font-semibold mt-1">Overdue for renewal!</p>
+        </div>
+
+        <!-- Pending Card -->
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 indicator-border-pending">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Under Review</span>
+            <span class="text-lg">⏳</span>
+          </div>
+          <div id="countPending" class="text-2xl sm:text-3xl font-extrabold text-sky-700 mt-2">0</div>
+          <p class="text-[11px] text-slate-500 mt-1">Officer review pending</p>
+        </div>
+      </div>
+
+      <!-- New Application Modal -->
+      <div id="newAppModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto border border-slate-200 my-8">
+          <div class="bg-navy text-gold font-bold px-6 py-4 flex items-center justify-between rounded-t-2xl sticky top-0 z-10 shadow">
+            <h3 class="text-base sm:text-lg flex items-center gap-2">
+              <span>⚖️</span> Register Instrument for Verification
+            </h3>
+            <button type="button" data-close-modal class="text-white/70 hover:text-white text-2xl font-bold">&times;</button>
+          </div>
+
+          <form id="instrumentForm" class="p-6 space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="instName" class="block text-xs font-bold text-navy uppercase tracking-wider mb-1">
+                  Instrument Name / Model *
+                </label>
+                <input type="text" id="instName" required placeholder="e.g. Heavy Duty Platform Scale X500"
+                  class="w-full border border-slate-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold">
+              </div>
+
+              <div>
+                <label for="instCategory" class="block text-xs font-bold text-navy uppercase tracking-wider mb-1">
+                  Category *
+                </label>
+                <select id="instCategory" required
+                  class="w-full border border-slate-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold">
+                  <option value="" disabled selected>Select category</option>
+                  <option value="Electronic Weighing Scale">Electronic Weighing Scale</option>
+                  <option value="Platform Scale">Platform Scale</option>
+                  <option value="Counter Scale">Counter Scale</option>
+                  <option value="Petrol Dispenser">Petrol Dispenser</option>
+                  <option value="Weighbridge">Weighbridge</option>
+                  <option value="Taxi Meter">Taxi Meter</option>
+                  <option value="Gas Cylinder Filling Machine">Gas Cylinder Filling Machine</option>
+                  <option value="Volumetric Measure">Volumetric Measure</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="instSerial" class="block text-xs font-bold text-navy uppercase tracking-wider mb-1">
+                  Machine Serial No. / ID
+                </label>
+                <input type="text" id="instSerial" placeholder="e.g. SN-8942-2025"
+                  class="w-full border border-slate-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold">
+              </div>
+
+              <div>
+                <label for="instCapacity" class="block text-xs font-bold text-navy uppercase tracking-wider mb-1">
+                  Capacity / Range
+                </label>
+                <input type="text" id="instCapacity" placeholder="e.g. 50 kg / 1000 kg / 50 L"
+                  class="w-full border border-slate-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="instShopName" class="block text-xs font-bold text-navy uppercase tracking-wider mb-1">
+                  Shop / Business Name *
+                </label>
+                <input type="text" id="instShopName" required
+                  class="w-full border border-slate-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold">
+              </div>
+
+              <div>
+                <label for="instPhone" class="block text-xs font-bold text-navy uppercase tracking-wider mb-1">
+                  Contact Phone *
+                </label>
+                <input type="tel" id="instPhone" required
+                  class="w-full border border-slate-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold">
+              </div>
+            </div>
+
+            <div>
+              <label for="instShopAddress" class="block text-xs font-bold text-navy uppercase tracking-wider mb-1">
+                Shop Location / Establishment Address *
+              </label>
+              <textarea id="instShopAddress" rows="2" required
+                class="w-full border border-slate-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold"></textarea>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-navy uppercase tracking-wider mb-1">
+                Instrument Photo Upload * (Clear image showing scale display &amp; body)
+              </label>
+              <div class="border-2 border-dashed border-slate-300 hover:border-gold rounded-xl p-4 text-center cursor-pointer transition-colors bg-slate-50 relative">
+                <input type="file" id="instPhoto" accept="image/*" required class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
+                <div id="photoPlaceholder" class="space-y-1">
+                  <div class="text-3xl">📷</div>
+                  <p class="text-xs font-semibold text-slate-700">Click or Drag &amp; Drop photo here</p>
+                  <p class="text-[10px] text-slate-400">PNG, JPG, WEBP up to 5MB</p>
+                </div>
+                <div id="photoPreviewContainer" class="hidden mt-2 flex justify-center">
+                  <img id="photoPreview" alt="Preview" class="max-h-40 rounded-lg shadow-sm border border-slate-200 object-cover">
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex justify-end gap-3">
+              <button type="button" data-close-modal
+                class="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-600 hover:bg-slate-50 text-xs font-semibold">
+                Cancel
+              </button>
+              <button type="submit" id="submitAppBtn"
+                class="bg-navy hover:bg-navy-light text-gold font-bold px-6 py-2.5 rounded-xl text-xs transition-all shadow-md flex items-center gap-2">
+                <span>Submit for Inspection &rarr;</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Quick Renewal Modal -->
+      <div id="renewModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md border border-slate-200 overflow-hidden">
+          <div class="bg-navy text-gold font-bold px-6 py-4 flex items-center justify-between">
+            <h3 class="text-sm font-bold flex items-center gap-2">
+              <span>🔄</span> Apply for Annual Re-Verification
+            </h3>
+            <button type="button" data-close-modal class="text-white/70 hover:text-white text-2xl font-bold">&times;</button>
+          </div>
+          <form id="renewForm" class="p-6 space-y-4">
+            <input type="hidden" id="renewAppId">
+            <div>
+              <p class="text-xs text-slate-500">Instrument:</p>
+              <h4 id="renewInstName" class="font-bold text-navy text-sm"></h4>
+              <p id="renewInstSerial" class="text-xs text-slate-400"></p>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-navy uppercase tracking-wider mb-1">
+                Upload Recent Machine Photo (Optional)
+              </label>
+              <input type="file" id="renewPhoto" accept="image/*"
+                class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-navy file:text-gold hover:file:bg-navy-light cursor-pointer">
+            </div>
+            <p class="text-[11px] text-slate-500 bg-amber-50 p-2.5 rounded-lg border border-amber-200">
+              Notice: Re-verification will be queued for the Legal Metrology Officer. Once inspected and approved, a new certificate with updated QR code and 1-year validity will be issued.
+            </p>
+            <div class="pt-3 border-t border-slate-100 flex justify-end gap-2">
+              <button type="button" data-close-modal class="px-4 py-2 rounded-xl border border-slate-300 text-xs font-semibold">
+                Cancel
+              </button>
+              <button type="submit" id="renewSubmitBtn" class="bg-gold hover:bg-gold-light text-navy font-bold px-5 py-2 rounded-xl text-xs shadow">
+                Submit Renewal Application
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Main Instruments List Section -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-slate-50/50">
+          <div>
+            <h2 class="text-lg font-bold text-navy">Registered Weighing &amp; Measuring Machines</h2>
+            <p class="text-xs text-slate-500">Track real-time government compliance and certificate validity</p>
+          </div>
+          <!-- Filter buttons -->
+          <div class="flex items-center gap-1.5 text-xs bg-slate-200/70 p-1 rounded-xl">
+            <button type="button" class="filter-btn active bg-white text-navy font-bold px-3 py-1 rounded-lg shadow-sm" data-filter="all">All</button>
+            <button type="button" class="filter-btn text-slate-600 font-semibold px-3 py-1 rounded-lg hover:text-navy" data-filter="green">🟢 Valid</button>
+            <button type="button" class="filter-btn text-slate-600 font-semibold px-3 py-1 rounded-lg hover:text-navy" data-filter="yellow">🟡 Due Soon</button>
+            <button type="button" class="filter-btn text-slate-600 font-semibold px-3 py-1 rounded-lg hover:text-navy" data-filter="red">🔴 Expired</button>
+          </div>
+        </div>
+
+        <div id="instrumentsContainer" class="p-6 divide-y divide-slate-100">
+          <!-- Dynamic cards inserted here -->
+          <div class="text-center py-12 text-slate-400 text-sm">
+            <span class="animate-spin inline-block text-xl mb-2">⏳</span>
+            <p>Loading registered instruments from Registry...</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Official Certificate Modal -->
+  <div id="certModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[92vh] overflow-y-auto border border-slate-200 my-8">
+      <div class="bg-navy text-gold font-bold px-6 py-3.5 flex items-center justify-between rounded-t-2xl sticky top-0 z-10 no-print">
+        <h3 class="text-sm sm:text-base flex items-center gap-2">
+          <span>📜</span> Legal Metrology Verification Certificate
+        </h3>
+        <div class="flex items-center gap-3">
+          <button type="button" id="printCertModalBtn" class="bg-gold hover:bg-gold-light text-navy text-xs font-bold px-3.5 py-1.5 rounded-lg transition-colors flex items-center gap-1 shadow">
+            <span>🖨️ Print Certificate</span>
+          </button>
+          <button type="button" data-close-modal class="text-white/70 hover:text-white text-2xl font-bold leading-none">&times;</button>
+        </div>
+      </div>
+
+      <div id="printableCertificateWrapper" class="p-6 sm:p-8">
+        <!-- Rendered Certificate Card -->
+        <div id="modalCertBody"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer-container"></div>
+
+  <script src="js/script.js"></script>
+  <script>
+    const user = requireAuth('Owner');
+    if (!user) throw new Error('Unauthorized');
+
+    initNavbar({ activePage: 'owner' });
+    initFooter();
+    initModalClose('newAppModal');
+    initModalClose('certModal');
+    initModalClose('renewModal');
+
+    document.getElementById('ownerDisplayName').textContent = user.name;
+    document.getElementById('ownerShopDetails').textContent = `${user.shopName || 'Retail Enterprise'} • ${user.shopAddress || 'Business Address'}`;
+
+    // Prefill submission form
+    document.getElementById('instShopName').value = user.shopName || '';
+    document.getElementById('instShopAddress').value = user.shopAddress || '';
+    document.getElementById('instPhone').value = user.phone || '';
+
+    // Open new app modal
+    document.getElementById('openNewAppBtn').addEventListener('click', () => {
+      openModal('newAppModal');
+    });
+
+    // Photo preview
+    const photoInput = document.getElementById('instPhoto');
+    const photoPreview = document.getElementById('photoPreview');
+    const photoContainer = document.getElementById('photoPreviewContainer');
+    const photoPlaceholder = document.getElementById('photoPlaceholder');
+
+    photoInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        photoPreview.src = ev.target.result;
+        photoContainer.classList.remove('hidden');
+        photoPlaceholder.classList.add('hidden');
+      };
+      reader.readAsDataURL(file);
+    });
+
+    let applicationsList = [];
+    let currentFilter = 'all';
+
+    async function loadApplications() {
+      try {
+        const data = await api('/api/applications/mine');
+        applicationsList = data.applications || [];
+        updateSummaryCounters();
+        renderInstruments();
+      } catch (err) {
+        showToast(err.message, 'error');
+        document.getElementById('instrumentsContainer').innerHTML = `
+          <div class="text-center py-12 text-red-500 text-sm">
+            <p>Failed to load instruments from database.</p>
+            <button onclick="loadApplications()" class="mt-2 text-xs bg-slate-200 px-3 py-1 rounded text-slate-700">Retry</button>
+          </div>
+        `;
+      }
+    }
+
+    function updateSummaryCounters() {
+      let green = 0, yellow = 0, red = 0, pending = 0;
+
+      applicationsList.forEach((app) => {
+        if (app.status === 'Pending') {
+          pending++;
+        } else if (app.status === 'Verified') {
+          const status = getRenewalStatus(app.expiryDate);
+          if (status.level === 'green') green++;
+          else if (status.level === 'yellow') yellow++;
+          else if (status.level === 'red') red++;
+        }
+      });
+
+      document.getElementById('countGreen').textContent = green;
+      document.getElementById('countYellow').textContent = yellow;
+      document.getElementById('countRed').textContent = red;
+      document.getElementById('countPending').textContent = pending;
+    }
+
+    function renderInstruments() {
+      const container = document.getElementById('instrumentsContainer');
+
+      let filtered = applicationsList;
+      if (currentFilter !== 'all') {
+        filtered = applicationsList.filter((app) => {
+          if (currentFilter === 'pending') return app.status === 'Pending';
+          if (app.status !== 'Verified') return false;
+          const status = getRenewalStatus(app.expiryDate);
+          return status.level === currentFilter;
+        });
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-14">
+            <div class="text-4xl mb-2">⚖️</div>
+            <h3 class="font-bold text-slate-700 text-base">No instruments found</h3>
+            <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
+              ${currentFilter === 'all' ? 'You have not registered any weighing or measuring instruments yet. Click "+ Register New Instrument" above to begin.' : 'No instruments matching the selected filter.'}
+            </p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map((app) => {
+        const isVerified = app.status === 'Verified';
+        const isPending = app.status === 'Pending';
+        const renewalStatus = isVerified ? getRenewalStatus(app.expiryDate) : getRenewalStatus(null);
+
+        return `
+          <div class="py-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 ${renewalStatus.borderClass} pl-4 pr-2 hover:bg-slate-50/70 transition-colors rounded-r-xl">
+            <!-- Left: Info & Photo -->
+            <div class="flex items-start gap-4">
+              <img src="${fileUrl(app.photo)}" alt="${escapeHtml(app.instrumentName)}"
+                class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover border border-slate-200 shadow-sm flex-shrink-0">
+              <div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <h3 class="font-bold text-navy text-base">${escapeHtml(app.instrumentName)}</h3>
+                  <span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${renewalStatus.badgeClass}">
+                    ${renewalStatus.label}
+                  </span>
+                </div>
+                <div class="text-xs text-slate-500 mt-1 space-x-2">
+                  <span>📂 <strong>${escapeHtml(app.category)}</strong></span>
+                  ${app.serialNumber ? `<span>&bull; SN: <strong>${escapeHtml(app.serialNumber)}</strong></span>` : ''}
+                  ${app.capacity ? `<span>&bull; Cap: <strong>${escapeHtml(app.capacity)}</strong></span>` : ''}
+                </div>
+                <div class="text-xs mt-2 flex flex-wrap items-center gap-4">
+                  ${isVerified ? `
+                    <span class="text-slate-600">Verification: <strong>${formatDate(app.verificationDate)}</strong></span>
+                    <span class="text-slate-600">Expiry: <strong>${formatDate(app.expiryDate)}</strong></span>
+                    <span class="text-xs font-mono text-navy bg-gold/15 px-2 py-0.5 rounded border border-gold/30">
+                      ID: ${escapeHtml(app.certificateId)}
+                    </span>
+                  ` : `
+                    <span class="text-sky-700 bg-sky-50 px-2 py-0.5 rounded text-xs font-medium">Submitted on ${formatDate(app.createdAt)} &bull; Pending Officer Inspection</span>
+                  `}
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Actions -->
+            <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full md:w-auto justify-end">
+              ${isVerified ? `
+                <button type="button" class="view-cert-btn bg-navy hover:bg-navy-light text-gold font-bold px-4 py-2 rounded-xl text-xs transition-colors shadow flex items-center gap-1.5"
+                  data-id="${app.id}">
+                  <span>📜 View Certificate &amp; QR</span>
+                </button>
+              ` : ''}
+
+              ${(isVerified && (renewalStatus.level === 'yellow' || renewalStatus.level === 'red')) ? `
+                <button type="button" class="renew-btn bg-gold hover:bg-gold-light text-navy font-bold px-4 py-2 rounded-xl text-xs transition-colors shadow flex items-center gap-1.5"
+                  data-id="${app.id}" data-name="${escapeHtml(app.instrumentName)}" data-serial="${escapeHtml(app.serialNumber || '')}">
+                  <span>🔄 Renew Now</span>
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Attach button listeners
+      document.querySelectorAll('.view-cert-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const app = applicationsList.find((a) => a.id === btn.dataset.id);
+          if (app) openCertificateModal(app);
+        });
+      });
+
+      document.querySelectorAll('.renew-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          document.getElementById('renewAppId').value = btn.dataset.id;
+          document.getElementById('renewInstName').textContent = btn.dataset.name;
+          document.getElementById('renewInstSerial').textContent = btn.dataset.serial ? `Serial: ${btn.dataset.serial}` : '';
+          openModal('renewModal');
+        });
+      });
+    }
+
+    // Filter switching
+    document.querySelectorAll('.filter-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach((b) => {
+          b.className = 'filter-btn text-slate-600 font-semibold px-3 py-1 rounded-lg hover:text-navy';
+        });
+        btn.className = 'filter-btn active bg-white text-navy font-bold px-3 py-1 rounded-lg shadow-sm';
+        currentFilter = btn.dataset.filter;
+        renderInstruments();
+      });
+    });
+
+    // Handle New Application Submission
+    document.getElementById('instrumentForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submitAppBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span>⏳ Uploading...</span>';
+
+      const formData = new FormData();
+      formData.append('instrumentName', document.getElementById('instName').value.trim());
+      formData.append('category', document.getElementById('instCategory').value);
+      formData.append('serialNumber', document.getElementById('instSerial').value.trim());
+      formData.append('capacity', document.getElementById('instCapacity').value.trim());
+      formData.append('shopName', document.getElementById('instShopName').value.trim());
+      formData.append('shopAddress', document.getElementById('instShopAddress').value.trim());
+      formData.append('phone', document.getElementById('instPhone').value.trim());
+
+      const photoFile = document.getElementById('instPhoto').files[0];
+      if (photoFile) {
+        formData.append('photo', photoFile);
+      }
+
+      try {
+        await api('/api/applications', {
+          method: 'POST',
+          body: formData,
+        });
+
+        showToast('Instrument application submitted successfully for officer review!', 'success');
+        closeModal('newAppModal');
+        e.target.reset();
+        photoContainer.classList.add('hidden');
+        photoPlaceholder.classList.remove('hidden');
+        loadApplications();
+      } catch (err) {
+        showToast(err.message || 'Failed to submit application', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Submit for Inspection &rarr;</span>';
+      }
+    });
+
+    // Handle Renewal Submission
+    document.getElementById('renewForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const appId = document.getElementById('renewAppId').value;
+      const btn = document.getElementById('renewSubmitBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span>⏳ Submitting...</span>';
+
+      const formData = new FormData();
+      const photoFile = document.getElementById('renewPhoto').files[0];
+      if (photoFile) {
+        formData.append('photo', photoFile);
+      }
+
+      try {
+        await api(`/api/applications/${appId}/renew`, {
+          method: 'POST',
+          body: formData,
+        });
+
+        showToast('Renewal submitted for inspection. Status is now pending review.', 'success');
+        closeModal('renewModal');
+        e.target.reset();
+        loadApplications();
+      } catch (err) {
+        showToast(err.message || 'Failed to submit renewal', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Submit Renewal Application';
+      }
+    });
+
+    // Open Official Certificate Modal
+    function openCertificateModal(app) {
+      const renewalStatus = getRenewalStatus(app.expiryDate);
+      const modalBody = document.getElementById('modalCertBody');
+      const verifyUrl = `${window.location.origin}/verify.html?code=${encodeURIComponent(app.certificateId)}`;
+
+      modalBody.innerHTML = `
+        <div id="printableCertificate" class="official-certificate rounded-2xl p-6 sm:p-8 bg-white relative overflow-hidden">
+          <div class="certificate-watermark">LEGAL METROLOGY</div>
+
+          <!-- Certificate Header -->
+          <div class="text-center border-b-2 border-gold/70 pb-4 mb-6">
+            <div class="flex items-center justify-center gap-3 mb-1">
+              <span class="text-3xl">🏛️</span>
+              <div>
+                <h2 class="text-lg sm:text-xl font-extrabold uppercase tracking-wide text-navy">
+                  Government of India &bull; Department of Consumer Affairs
+                </h2>
+                <h3 class="text-xs sm:text-sm font-bold text-gold uppercase tracking-wider">
+                  Legal Metrology Verification Certificate
+                </h3>
+              </div>
+            </div>
+            <p class="text-[11px] text-slate-500">Issued pursuant to Section 24 of Legal Metrology Act, 2009 &amp; General Rules</p>
+          </div>
+
+          <!-- Certificate Meta Row -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center mb-6">
+            <div class="md:col-span-2 space-y-3 text-xs">
+              <div class="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                <div>
+                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Special Certificate ID</span>
+                  <span class="font-mono font-bold text-navy text-sm">${escapeHtml(app.certificateId)}</span>
+                </div>
+                <div>
+                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Compliance Status</span>
+                  <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold ${renewalStatus.badgeClass}">
+                    ${renewalStatus.label}
+                  </span>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Trader / Owner Name</span>
+                  <p class="font-bold text-navy text-sm">${escapeHtml(app.ownerName)}</p>
+                </div>
+                <div>
+                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Establishment / Shop</span>
+                  <p class="font-semibold text-slate-700">${escapeHtml(app.shopName)}</p>
+                </div>
+              </div>
+
+              <div>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Premises Address</span>
+                <p class="text-slate-600">${escapeHtml(app.shopAddress)}</p>
+              </div>
+
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-100">
+                <div>
+                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Instrument Name</span>
+                  <p class="font-semibold text-navy">${escapeHtml(app.instrumentName)}</p>
+                </div>
+                <div>
+                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Category</span>
+                  <p class="text-slate-700">${escapeHtml(app.category)}</p>
+                </div>
+                <div>
+                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Serial / Cap</span>
+                  <p class="text-slate-700">${escapeHtml(app.serialNumber || 'N/A')} &bull; ${escapeHtml(app.capacity || 'Standard')}</p>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100">
+                <div>
+                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Verification Date</span>
+                  <p class="font-bold text-green-700">${formatDate(app.verificationDate)}</p>
+                </div>
+                <div>
+                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Valid Until (Expiry)</span>
+                  <p class="font-bold ${renewalStatus.level === 'red' ? 'text-red-600' : 'text-navy'}">${formatDate(app.expiryDate)}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- QR Code Card -->
+            <div class="flex flex-col items-center justify-center p-4 bg-slate-50 rounded-2xl border border-slate-200 text-center">
+              <canvas id="certQrCanvas" class="rounded-lg shadow-sm border border-slate-200"></canvas>
+              <span class="text-[10px] font-bold text-navy uppercase tracking-wider mt-2.5">
+                Scan with any Smartphone
+              </span>
+              <p class="text-[10px] text-slate-400 mt-0.5">Instant Public Verification</p>
+            </div>
+          </div>
+
+          <!-- Observations & Officer Stamp -->
+          <div class="pt-4 border-t-2 border-gold/40 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 text-xs">
+            <div>
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Inspector Observations:</span>
+              <p class="text-slate-600 italic">"${escapeHtml(app.observations || 'Verified conforming to standard weights and measures specifications.')}"</p>
+            </div>
+            <div class="text-right flex flex-col items-center sm:items-end">
+              <div class="w-24 h-10 border-b border-dashed border-slate-400 mb-1"></div>
+              <span class="font-bold text-navy text-xs">Legal Metrology Officer</span>
+              <span class="text-[10px] text-slate-400">Government Authorized Signatory</span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Render scannable QR Code
+      const qrCanvas = document.getElementById('certQrCanvas');
+      QRCode.toCanvas(qrCanvas, verifyUrl, {
+        width: 140,
+        margin: 1,
+        color: {
+          dark: '#1E2761',
+          light: '#FFFFFF',
+        },
+      });
+
+      openModal('certModal');
+    }
+
+    // Print certificate button
+    document.getElementById('printCertModalBtn').addEventListener('click', () => {
+      printElement('printableCertificate');
+    });
+
+    // Initial fetch
+    loadApplications();
+  </script>
+</body>
+</html>

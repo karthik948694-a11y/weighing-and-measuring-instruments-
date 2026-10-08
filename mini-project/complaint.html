@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File a Citizen Complaint | Legal Metrology Redressal Portal</title>
+  <meta name="description" content="Report businesses operating unrenewed, tampered, or inaccurate weighing machines. Upload photo evidence directly to Legal Metrology Officers.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="tailwind-config.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="min-h-screen flex flex-col bg-slate-50 text-slate-800">
+
+  <div id="navbar-container"></div>
+
+  <main class="flex-1 pb-16">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-red-900 via-navy to-slate-900 text-white py-10 shadow-md">
+      <div class="max-w-4xl mx-auto px-4 text-center">
+        <div class="inline-flex items-center gap-2 bg-red-500/20 text-red-200 border border-red-400/30 text-xs font-semibold px-3 py-1 rounded-full mb-3 uppercase tracking-wider">
+          <span>📣 Citizen Grievance Redressal</span>
+        </div>
+        <h1 class="text-2xl sm:text-4xl font-extrabold text-white">
+          Report Non-Compliant Seller or Machine
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-200/90 mt-2 max-w-2xl mx-auto leading-relaxed">
+          Has a shopkeeper failed to renew their weighing machine, tampered with calibration, or refused to provide standard weights? File a formal complaint with photos below.
+        </p>
+      </div>
+    </div>
+
+    <div class="max-w-3xl mx-auto px-4 -mt-6">
+
+      <!-- Success Screen (Hidden by default) -->
+      <div id="successCard" class="hidden bg-white rounded-2xl shadow-xl p-8 border border-green-200 text-center space-y-4">
+        <div class="w-16 h-16 bg-green-100 text-green-700 text-3xl rounded-full flex items-center justify-center mx-auto shadow-sm">
+          ✓
+        </div>
+        <h2 class="text-xl sm:text-2xl font-black text-navy">Grievance Registered Successfully</h2>
+        <p class="text-xs sm:text-sm text-slate-600 max-w-md mx-auto">
+          Your complaint and photographic evidence have been transmitted to the District Legal Metrology Officer. An inspection will be scheduled.
+        </p>
+
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 inline-block text-left my-2">
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Official Tracking Ref:</span>
+          <span id="createdComplaintRef" class="font-mono font-extrabold text-red-700 text-lg sm:text-xl"></span>
+        </div>
+
+        <div class="pt-4 flex flex-wrap justify-center gap-3 text-xs font-semibold">
+          <a href="index.html" class="bg-navy hover:bg-navy-light text-gold px-5 py-2.5 rounded-xl transition-colors shadow">
+            Return to Home
+          </a>
+          <button type="button" id="fileAnotherBtn" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl border border-slate-200">
+            File Another Grievance
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Complaint Form -->
+      <div id="complaintFormWrapper" class="bg-white rounded-2xl shadow-xl border border-slate-200/80 overflow-hidden">
+        <div class="bg-slate-50/80 px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+          <span class="font-bold text-navy text-sm flex items-center gap-2">
+            <span>📝</span> Legal Metrology Offense Submission Form
+          </span>
+          <span class="text-[11px] text-red-600 font-semibold">* Required fields</span>
+        </div>
+
+        <form id="complaintForm" class="p-6 sm:p-8 space-y-6">
+
+          <!-- Section 1: Business / Seller Being Reported -->
+          <div>
+            <h3 class="text-xs font-black uppercase tracking-wider text-navy mb-3 flex items-center gap-1.5">
+              <span>1️⃣</span> Accused Business / Seller Information
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="sellerName" class="block text-xs font-bold text-slate-700 mb-1">
+                  Business Owner / Seller Name *
+                </label>
+                <input type="text" id="sellerName" required placeholder="e.g. Suresh Kumar"
+                  class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-gold">
+              </div>
+
+              <div>
+                <label for="shopName" class="block text-xs font-bold text-slate-700 mb-1">
+                  Shop / Market Stall Name *
+                </label>
+                <input type="text" id="shopName" required placeholder="e.g. Kumar Fresh Mart"
+                  class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-gold">
+              </div>
+
+              <div class="sm:col-span-2">
+                <label for="shopAddress" class="block text-xs font-bold text-slate-700 mb-1">
+                  Shop Address / Location / Landmark *
+                </label>
+                <textarea id="shopAddress" rows="2" required placeholder="Shop #4, Gandhi Market Road, Opposite Bus Stand..."
+                  class="w-full border border-slate-300 rounded-xl px-4 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-gold"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Violation Nature -->
+          <div class="pt-4 border-t border-slate-100">
+            <h3 class="text-xs font-black uppercase tracking-wider text-navy mb-3 flex items-center gap-1.5">
+              <span>2️⃣</span> Nature of Metrology Violation
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="sm:col-span-2">
+                <label for="violationType" class="block text-xs font-bold text-slate-700 mb-1">
+                  Primary Offense Category *
+                </label>
+                <select id="violationType" required
+                  class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-gold">
+                  <option value="Expired Machine / No Renewal" selected>Weighing Machine Expired / No Annual Renewal</option>
+                  <option value="Tampered Weights / Manipulated Scale">Tampered / Calibrated for Short-Weight (Cheating)</option>
+                  <option value="Broken or Missing Government Seal">Broken or Missing Legal Metrology Lead Verification Seal</option>
+                  <option value="Refusal to Display Certificate or QR">Refused to Display or Show Official QR Certificate</option>
+                  <option value="Using Uncertified / Domestic Scale in Trade">Using Uncertified / Household Scale for Commercial Trade</option>
+                  <option value="Short Measurement of Petrol/Diesel">Short Fuel Delivery / Dispenser Discrepancy</option>
+                  <option value="Other Legal Metrology Violation">Other Consumer Deception Violation</option>
+                </select>
+              </div>
+
+              <div class="sm:col-span-2">
+                <label for="description" class="block text-xs font-bold text-slate-700 mb-1">
+                  Detailed Statement / Incident Description *
+                </label>
+                <textarea id="description" rows="3" required placeholder="Describe what occurred, date/time, whether items were weighed short, or if the machine has no renewal stamp..."
+                  class="w-full border border-slate-300 rounded-xl px-4 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-gold"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: Evidence Photo Upload -->
+          <div class="pt-4 border-t border-slate-100">
+            <h3 class="text-xs font-black uppercase tracking-wider text-navy mb-2 flex items-center gap-1.5">
+              <span>3️⃣</span> Upload Photographic Evidence *
+            </h3>
+            <p class="text-xs text-slate-500 mb-3">
+              Upload 1 to 5 clear photos of the weighing scale, shop display, receipt, or expired certificate sticker.
+            </p>
+
+            <div class="border-2 border-dashed border-slate-300 hover:border-gold rounded-xl p-5 text-center cursor-pointer transition-colors bg-slate-50 relative">
+              <input type="file" id="evidencePhotos" accept="image/*" multiple required
+                class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
+              <div id="photosEmptyState">
+                <div class="text-3xl mb-1">📸</div>
+                <p class="text-xs font-bold text-slate-700">Click or Tap to Select Evidence Photos</p>
+                <p class="text-[11px] text-slate-400">Multiple files supported (JPG, PNG, WEBP)</p>
+              </div>
+              <div id="photoPreviewsGrid" class="flex flex-wrap gap-2 justify-center mt-2 hidden"></div>
+            </div>
+          </div>
+
+          <!-- Section 4: Complainant (Citizen) Details -->
+          <div class="pt-4 border-t border-slate-100">
+            <h3 class="text-xs font-black uppercase tracking-wider text-navy mb-3 flex items-center gap-1.5">
+              <span>4️⃣</span> Your Details (Complainant)
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label for="complainantName" class="block text-xs font-bold text-slate-700 mb-1">
+                  Your Full Name *
+                </label>
+                <input type="text" id="complainantName" required placeholder="Citizen Name"
+                  class="w-full border border-slate-300 rounded-xl px-4 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-gold">
+              </div>
+
+              <div>
+                <label for="complainantPhone" class="block text-xs font-bold text-slate-700 mb-1">
+                  Your Mobile Phone *
+                </label>
+                <input type="tel" id="complainantPhone" required placeholder="+91 98765 00000"
+                  class="w-full border border-slate-300 rounded-xl px-4 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-gold">
+              </div>
+
+              <div>
+                <label for="complainantEmail" class="block text-xs font-bold text-slate-700 mb-1">
+                  Email Address (Optional)
+                </label>
+                <input type="email" id="complainantEmail" placeholder="for updates on action taken"
+                  class="w-full border border-slate-300 rounded-xl px-4 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-gold">
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-4 border-t border-slate-100">
+            <button type="submit" id="submitComplaintBtn"
+              class="w-full bg-red-700 hover:bg-red-800 text-white font-extrabold py-3.5 rounded-xl transition-all shadow-lg text-sm flex items-center justify-center gap-2">
+              <span>🚨 Submit Complaint to Legal Metrology Department</span>
+            </button>
+            <p class="text-[11px] text-slate-400 text-center mt-2">
+              All submissions are logged in the Government Enforcement Registry under consumer protection statutes.
+            </p>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+
+  <script src="script.js"></script>
+  <script>
+    initNavbar({ activePage: 'complaint' });
+    initFooter();
+
+    // Auto-fill from URL query parameters (e.g. from verify.html when an expired certificate is reported)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('seller')) document.getElementById('sellerName').value = urlParams.get('seller');
+    if (urlParams.get('shop')) document.getElementById('shopName').value = urlParams.get('shop');
+    if (urlParams.get('address')) document.getElementById('shopAddress').value = urlParams.get('address');
+    if (urlParams.get('description')) document.getElementById('description').value = urlParams.get('description');
+
+    // Complainant photo previews
+    const fileInput = document.getElementById('evidencePhotos');
+    const previewsGrid = document.getElementById('photoPreviewsGrid');
+    const emptyState = document.getElementById('photosEmptyState');
+
+    fileInput.addEventListener('change', () => {
+      previewsGrid.innerHTML = '';
+      if (fileInput.files.length > 0) {
+        previewsGrid.classList.remove('hidden');
+        emptyState.classList.add('hidden');
+
+        Array.from(fileInput.files).forEach((file) => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.className = 'w-16 h-16 object-cover rounded-lg border border-slate-300 shadow-sm';
+            previewsGrid.appendChild(img);
+          };
+          reader.readAsDataURL(file);
+        });
+      } else {
+        previewsGrid.classList.add('hidden');
+        emptyState.classList.remove('hidden');
+      }
+    });
+
+    // Form Submission
+    document.getElementById('complaintForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submitComplaintBtn');
+
+      if (!fileInput.files || fileInput.files.length === 0) {
+        showToast('Please upload at least one evidence photo.', 'warning');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span>⏳ Lodging complaint with officers...</span>';
+
+      const formData = new FormData();
+      formData.append('sellerName', document.getElementById('sellerName').value.trim());
+      formData.append('shopName', document.getElementById('shopName').value.trim());
+      formData.append('shopAddress', document.getElementById('shopAddress').value.trim());
+      formData.append('violationType', document.getElementById('violationType').value);
+      formData.append('description', document.getElementById('description').value.trim());
+      formData.append('complainantName', document.getElementById('complainantName').value.trim());
+      formData.append('complainantPhone', document.getElementById('complainantPhone').value.trim());
+      formData.append('complainantEmail', document.getElementById('complainantEmail').value.trim());
+
+      Array.from(fileInput.files).forEach((file) => {
+        formData.append('photos', file);
+      });
+
+      try {
+        const res = await api('/api/complaints', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const complaintRef = res.complaint.complaintNumber || 'CMP-2026';
+        document.getElementById('createdComplaintRef').textContent = complaintRef;
+
+        document.getElementById('complaintFormWrapper').classList.add('hidden');
+        document.getElementById('successCard').classList.remove('hidden');
+        showToast('Grievance lodged successfully with the department!', 'success');
+      } catch (err) {
+        showToast(err.message || 'Could not submit complaint', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>🚨 Submit Complaint to Legal Metrology Department</span>';
+      }
+    });
+
+    document.getElementById('fileAnotherBtn').addEventListener('click', () => {
+      document.getElementById('complaintForm').reset();
+      previewsGrid.innerHTML = '';
+      previewsGrid.classList.add('hidden');
+      emptyState.classList.remove('hidden');
+      document.getElementById('successCard').classList.add('hidden');
+      document.getElementById('complaintFormWrapper').classList.remove('hidden');
+    });
+  </script>
+</body>
+</html>
+

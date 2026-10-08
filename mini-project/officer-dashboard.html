@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Legal Metrology Officer Dashboard | LMVS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/tailwind-config.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-50 text-slate-800">
+
+  <div id="navbar-container"></div>
+
+  <main class="flex-1 pb-16">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-navy via-navy-light to-slate-900 text-white py-8 border-b border-navy-light shadow-md">
+      <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <div class="inline-flex items-center gap-2 bg-gold/20 text-gold text-xs font-semibold px-2.5 py-0.5 rounded-full mb-1">
+            <span>👮 Government Enforcement &amp; Verification Portal</span>
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-white">
+            Officer Dashboard: <span id="officerName" class="text-gold">Inspector</span>
+          </h1>
+          <p class="text-xs text-slate-300 mt-1">Legal Metrology Department &bull; District Enforcement Division</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-xs bg-white/10 px-3 py-1.5 rounded-xl border border-white/20 text-slate-200">
+            🟢 System Active &amp; Ready
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="max-w-6xl mx-auto px-4 mt-8 space-y-8">
+
+      <!-- Metrics Row -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Pending Review</span>
+          <div id="statPending" class="text-2xl sm:text-3xl font-extrabold text-sky-700 mt-2">0</div>
+          <p class="text-[11px] text-slate-500 mt-1">Requires inspection</p>
+        </div>
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Verified</span>
+          <div id="statVerified" class="text-2xl sm:text-3xl font-extrabold text-green-700 mt-2">0</div>
+          <p class="text-[11px] text-slate-500 mt-1">Active certificates</p>
+        </div>
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Overdue / Expired</span>
+          <div id="statExpired" class="text-2xl sm:text-3xl font-extrabold text-red-600 mt-2">0</div>
+          <p class="text-[11px] text-red-600 font-semibold mt-1">Notice required</p>
+        </div>
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Citizen Complaints</span>
+          <div id="statComplaints" class="text-2xl sm:text-3xl font-extrabold text-amber-600 mt-2">0</div>
+          <p class="text-[11px] text-amber-700 mt-1">Public reports filed</p>
+        </div>
+      </div>
+
+      <!-- Main Navigation Tabs -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+        <div class="flex border-b border-slate-200 bg-slate-50/70 text-xs sm:text-sm font-semibold">
+          <button type="button" id="tabPendingBtn"
+            class="tab-btn flex-1 py-3.5 text-center text-navy border-b-2 border-gold bg-white transition-all flex items-center justify-center gap-2">
+            <span>📋 Pending</span>
+            <span id="badgePendingCount" class="bg-navy text-gold text-xs px-2 py-0.5 rounded-full">0</span>
+          </button>
+          <button type="button" id="tabInspectionsBtn"
+            class="tab-btn flex-1 py-3.5 text-center text-slate-500 hover:text-navy border-b-2 border-transparent transition-all flex items-center justify-center gap-2">
+            <span>🔎 Physical Inspections</span>
+            <span id="badgeInspectionsCount" class="bg-amber-500 text-white text-xs px-2 py-0.5 rounded-full hidden">0</span>
+          </button>
+          <button type="button" id="tabVerifiedBtn"
+            class="tab-btn flex-1 py-3.5 text-center text-slate-500 hover:text-navy border-b-2 border-transparent transition-all flex items-center justify-center gap-2">
+            <span>🛡️ Verified &amp; Alerts</span>
+          </button>
+          <button type="button" id="tabComplaintsBtn"
+            class="tab-btn flex-1 py-3.5 text-center text-slate-500 hover:text-navy border-b-2 border-transparent transition-all flex items-center justify-center gap-2">
+            <span>📢 Complaints</span>
+            <span id="badgeComplaintsCount" class="bg-red-600 text-white text-xs px-2 py-0.5 rounded-full">0</span>
+          </button>
+        </div>
+
+        <!-- TAB 1: PENDING APPLICATIONS -->
+        <div id="tabPendingSection" class="p-6">
+          <div class="flex justify-between items-center mb-4">
+            <div>
+              <h3 class="font-bold text-navy text-base">Commercial Instrument Applications Awaiting Approval</h3>
+              <p class="text-xs text-slate-500">Review machine specifications, inspect uploaded photo, and issue QR certification</p>
+            </div>
+            <button type="button" onclick="loadPendingApplications()" class="text-xs bg-slate-100 hover:bg-slate-200 text-navy font-semibold px-3 py-1.5 rounded-lg border border-slate-200">
+              🔄 Refresh
+            </button>
+          </div>
+
+          <div id="pendingListContainer" class="divide-y divide-slate-100">
+            <div class="text-center py-10 text-slate-400 text-sm">
+              <span class="animate-spin inline-block text-xl mb-1">⏳</span>
+              <p>Loading pending verification requests...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: PHYSICAL INSPECTIONS -->
+        <div id="tabInspectionsSection" class="p-6 hidden">
+          <div class="flex justify-between items-center mb-4">
+            <div>
+              <h3 class="font-bold text-navy text-base">🔎 Scheduled Physical Inspections</h3>
+              <p class="text-xs text-slate-500">Applications that require on-site visit before approval or rejection</p>
+            </div>
+            <button type="button" onclick="loadPhysicalInspections()" class="text-xs bg-slate-100 hover:bg-slate-200 text-navy font-semibold px-3 py-1.5 rounded-lg border border-slate-200">
+              🔄 Refresh
+            </button>
+          </div>
+          <div id="inspectionsListContainer" class="divide-y divide-slate-100">
+            <div class="text-center py-10 text-slate-400 text-sm">
+              <span class="text-2xl mb-2 block">🔎</span>
+              <p>No physical inspections scheduled yet.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: VERIFIED MACHINES & ALERTS -->
+        <div id="tabVerifiedSection" class="p-6 hidden">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+            <div>
+              <h3 class="font-bold text-navy text-base">Verified Instruments Registry</h3>
+              <p class="text-xs text-slate-500">Monitor traffic-light renewal statuses across all licensed commercial entities</p>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+              <button type="button" class="verified-filter active bg-navy text-white px-3 py-1 rounded-lg" data-vfilter="all">All</button>
+              <button type="button" class="verified-filter bg-slate-100 text-slate-700 px-3 py-1 rounded-lg" data-vfilter="green">🟢 Valid</button>
+              <button type="button" class="verified-filter bg-slate-100 text-slate-700 px-3 py-1 rounded-lg" data-vfilter="yellow">🟡 Due Soon</button>
+              <button type="button" class="verified-filter bg-slate-100 text-slate-700 px-3 py-1 rounded-lg" data-vfilter="red">🔴 Overdue</button>
+            </div>
+          </div>
+
+          <div id="verifiedListContainer" class="divide-y divide-slate-100">
+            <!-- Dynamic verified items -->
+          </div>
+        </div>
+
+        <!-- TAB 3: CITIZEN COMPLAINTS -->
+        <div id="tabComplaintsSection" class="p-6 hidden">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+            <div>
+              <h3 class="font-bold text-navy text-base">Citizen Grievances &amp; Non-Compliance Reports</h3>
+              <p class="text-xs text-slate-500">Complaints lodged by consumers regarding unrenewed, uncalibrated, or tampered machines</p>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+              <select id="complaintFilterSelect" class="border border-slate-300 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-gold font-medium">
+                <option value="All">All Statuses</option>
+                <option value="Pending">Pending Review</option>
+                <option value="Under Review">Under Review</option>
+                <option value="Action Taken">Action Taken</option>
+                <option value="Resolved">Resolved</option>
+                <option value="Dismissed">Dismissed</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="complaintsListContainer" class="divide-y divide-slate-100">
+            <!-- Dynamic complaints -->
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Review Application Modal -->
+  <div id="reviewModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto border border-slate-200 my-8">
+      <div class="bg-navy text-gold font-bold px-6 py-4 flex items-center justify-between sticky top-0 z-10 shadow">
+        <h3 class="text-base font-bold flex items-center gap-2">
+          <span>🔍</span> Inspection &amp; Approval Evaluation
+        </h3>
+        <button type="button" data-close-modal class="text-white/70 hover:text-white text-2xl font-bold">&times;</button>
+      </div>
+
+      <div class="p-6 space-y-4">
+        <!-- Business & Instrument Info -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <div>
+            <span class="text-slate-400 font-bold uppercase text-[10px] block">Business Owner</span>
+            <p id="revOwnerName" class="font-bold text-navy text-sm mt-0.5"></p>
+          </div>
+          <div>
+            <span class="text-slate-400 font-bold uppercase text-[10px] block">Shop / Enterprise</span>
+            <p id="revShopName" class="font-semibold text-slate-700 mt-0.5"></p>
+          </div>
+          <div>
+            <span class="text-slate-400 font-bold uppercase text-[10px] block">Shop Address</span>
+            <p id="revShopAddress" class="text-slate-600 mt-0.5"></p>
+          </div>
+          <div>
+            <span class="text-slate-400 font-bold uppercase text-[10px] block">Owner Phone</span>
+            <p id="revPhone" class="text-slate-600 mt-0.5"></p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+          <div>
+            <span class="text-slate-400 font-bold uppercase text-[10px] block">Instrument Name</span>
+            <p id="revInstName" class="font-bold text-navy mt-0.5"></p>
+          </div>
+          <div>
+            <span class="text-slate-400 font-bold uppercase text-[10px] block">Category</span>
+            <p id="revCategory" class="font-semibold text-slate-700 mt-0.5"></p>
+          </div>
+          <div>
+            <span class="text-slate-400 font-bold uppercase text-[10px] block">Serial &amp; Capacity</span>
+            <p id="revSerialCapacity" class="font-semibold text-slate-700 mt-0.5"></p>
+          </div>
+        </div>
+
+        <!-- Uploaded Photo -->
+        <div>
+          <span class="text-slate-400 font-bold uppercase text-[10px] block mb-1">Uploaded Machine Photo for Verification</span>
+          <div class="bg-slate-100 rounded-xl p-2 border border-slate-200 flex justify-center">
+            <img id="revPhoto" src="" alt="Machine photo" class="max-h-56 rounded-lg object-contain shadow-sm">
+          </div>
+        </div>
+
+        <!-- Inspection Result Form -->
+        <div class="pt-3 border-t border-slate-100 space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-navy uppercase tracking-wider mb-1.5">
+              Inspector Verification Finding *
+            </label>
+            <div class="flex items-center gap-6 text-sm">
+              <label class="inline-flex items-center gap-2 cursor-pointer font-semibold text-green-700">
+                <input type="radio" name="revResult" value="Pass" checked class="accent-green-600 w-4 h-4">
+                <span>Pass (Conforms to Standards)</span>
+              </label>
+              <label class="inline-flex items-center gap-2 cursor-pointer font-semibold text-red-700">
+                <input type="radio" name="revResult" value="Fail" class="accent-red-600 w-4 h-4">
+                <span>Fail (Non-Compliant)</span>
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label for="revObservations" class="block text-xs font-bold text-navy uppercase tracking-wider mb-1">
+              Officer Observations / Inspection Remarks
+            </label>
+            <textarea id="revObservations" rows="2" placeholder="e.g. Scale inspected and verified within permissible maximum error limits."
+              class="w-full border border-slate-300 rounded-xl px-4 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-gold"></textarea>
+          </div>
+        </div>
+
+        <!-- Physical Inspection Scheduling Panel -->
+        <div class="pt-3 border-t-2 border-amber-200 bg-amber-50 rounded-xl p-4 space-y-3">
+          <p class="text-xs font-bold text-amber-800 uppercase tracking-wider flex items-center gap-1.5">
+            🔎 Schedule Physical (On-Site) Inspection
+          </p>
+          <p class="text-[11px] text-amber-700">Use this when you cannot decide remotely and need to visit the business premises before approving or rejecting.</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label for="inspectionDateInput" class="block text-[10px] font-bold text-amber-800 uppercase mb-1">Scheduled Visit Date *</label>
+              <input type="date" id="inspectionDateInput" class="w-full border border-amber-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white">
+            </div>
+            <div>
+              <label for="inspectionNotesInput" class="block text-[10px] font-bold text-amber-800 uppercase mb-1">Inspection Notes</label>
+              <input type="text" id="inspectionNotesInput" placeholder="e.g. Verify weighbridge calibration on-site" class="w-full border border-amber-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white">
+            </div>
+          </div>
+          <div class="flex justify-end">
+            <button type="button" id="scheduleInspectBtn" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow flex items-center gap-1.5">
+              📅 Confirm Physical Inspection Schedule
+            </button>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-100 flex flex-wrap justify-end gap-3">
+          <button type="button" data-close-modal class="px-5 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold hover:bg-slate-50">
+            Cancel
+          </button>
+          <button type="button" id="rejectActionBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow">
+            ❌ Reject Application
+          </button>
+          <button type="button" id="approveActionBtn" class="bg-navy hover:bg-navy-light text-gold font-bold px-6 py-2.5 rounded-xl text-xs shadow flex items-center gap-1.5">
+            <span>✨ Approve &amp; Generate QR Certificate</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Complaint Action Modal -->
+  <div id="complaintModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto border border-slate-200 my-8">
+      <div class="bg-red-800 text-white font-bold px-6 py-4 flex items-center justify-between sticky top-0 z-10 shadow">
+        <h3 class="text-base font-bold flex items-center gap-2">
+          <span>📢</span> Citizen Grievance Investigation
+        </h3>
+        <button type="button" data-close-modal class="text-white/70 hover:text-white text-2xl font-bold">&times;</button>
+      </div>
+
+      <div class="p-6 space-y-4 text-xs">
+        <div class="flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-200">
+          <div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase">Complaint Ref ID</span>
+            <p id="cmpModalNumber" class="font-mono font-bold text-navy text-sm"></p>
+          </div>
+          <div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase">Date Lodged</span>
+            <p id="cmpModalDate" class="font-medium text-slate-600"></p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="bg-amber-50/60 p-3.5 rounded-xl border border-amber-200">
+            <span class="text-[10px] font-bold text-amber-800 uppercase block mb-1">Accused Seller / Shop Details</span>
+            <p class="font-bold text-navy text-sm" id="cmpModalSeller"></p>
+            <p class="font-semibold text-slate-700" id="cmpModalShop"></p>
+            <p class="text-slate-600 mt-1" id="cmpModalAddress"></p>
+          </div>
+
+          <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+            <span class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Complainant (Citizen)</span>
+            <p class="font-bold text-slate-800 text-sm" id="cmpModalComplainant"></p>
+            <p class="text-slate-600" id="cmpModalPhone"></p>
+            <p class="text-slate-500" id="cmpModalEmail"></p>
+          </div>
+        </div>
+
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Reported Violation Type</span>
+          <p id="cmpModalViolation" class="font-bold text-red-700 bg-red-50 p-2 rounded-lg border border-red-200"></p>
+        </div>
+
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Complainant Statement &amp; Description</span>
+          <p id="cmpModalDesc" class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-slate-700 leading-relaxed"></p>
+        </div>
+
+        <!-- Evidence Photos Gallery -->
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Evidence Photos Uploaded by Citizen</span>
+          <div id="cmpModalPhotosGallery" class="flex flex-wrap gap-3 p-3 bg-slate-100 rounded-xl border border-slate-200"></div>
+        </div>
+
+        <!-- Officer Update Section -->
+        <div class="pt-4 border-t border-slate-100 space-y-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label for="cmpStatusSelect" class="block text-xs font-bold text-navy uppercase tracking-wider mb-1">
+                Investigation Status *
+              </label>
+              <select id="cmpStatusSelect" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-gold">
+                <option value="Pending">Pending</option>
+                <option value="Under Review">Under Review</option>
+                <option value="Action Taken">Action Taken / Notice Issued</option>
+                <option value="Resolved">Resolved</option>
+                <option value="Dismissed">Dismissed</option>
+              </select>
+            </div>
+            <div>
+              <label for="cmpOfficerNotes" class="block text-xs font-bold text-navy uppercase tracking-wider mb-1">
+                Officer Notes / Inspection Report
+              </label>
+              <input type="text" id="cmpOfficerNotes" placeholder="e.g. Field inspection conducted; notice issued under Sec 30."
+                class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-gold">
+            </div>
+          </div>
+
+          <div class="flex justify-end gap-3 pt-2">
+            <button type="button" data-close-modal class="px-5 py-2 rounded-xl border border-slate-300 text-xs font-semibold">
+              Close
+            </button>
+            <button type="button" id="saveComplaintBtn" class="bg-navy hover:bg-navy-light text-gold font-bold px-6 py-2 rounded-xl text-xs shadow">
+              Update Complaint Record
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer-container"></div>
+
+  <script src="js/script.js"></script>
+  <script>
+    const user = requireAuth('Officer');
+    if (!user) throw new Error('Unauthorized');
+
+    initNavbar({ activePage: 'officer' });
+    initFooter();
+    initModalClose('reviewModal');
+    initModalClose('complaintModal');
+
+    document.getElementById('officerName').textContent = user.name;
+
+    let pendingList = [];
+    let verifiedList = [];
+    let complaintsList = [];
+    let currentAppId = null;
+    let currentComplaintId = null;
+
+    // Tab Switching
+    const tabPendingBtn = document.getElementById('tabPendingBtn');
+    const tabInspectionsBtn = document.getElementById('tabInspectionsBtn');
+    const tabVerifiedBtn = document.getElementById('tabVerifiedBtn');
+    const tabComplaintsBtn = document.getElementById('tabComplaintsBtn');
+    const tabPendingSection = document.getElementById('tabPendingSection');
+    const tabInspectionsSection = document.getElementById('tabInspectionsSection');
+    const tabVerifiedSection = document.getElementById('tabVerifiedSection');
+    const tabComplaintsSection = document.getElementById('tabComplaintsSection');
+
+    function setActiveTab(btn, section) {
+      document.querySelectorAll('.tab-btn').forEach((b) => {
+        b.className = 'tab-btn flex-1 py-3.5 text-center text-slate-500 hover:text-navy border-b-2 border-transparent transition-all flex items-center justify-center gap-2';
+      });
+      btn.className = 'tab-btn flex-1 py-3.5 text-center text-navy border-b-2 border-gold bg-white transition-all flex items-center justify-center gap-2';
+
+      tabPendingSection.classList.add('hidden');
+      tabInspectionsSection.classList.add('hidden');
+      tabVerifiedSection.classList.add('hidden');
+      tabComplaintsSection.classList.add('hidden');
+      section.classList.remove('hidden');
+    }
+
+    tabPendingBtn.addEventListener('click', () => {
+      setActiveTab(tabPendingBtn, tabPendingSection);
+      loadPendingApplications();
+    });
+
+    tabInspectionsBtn.addEventListener('click', () => {
+      setActiveTab(tabInspectionsBtn, tabInspectionsSection);
+      loadPhysicalInspections();
+    });
+
+    tabVerifiedBtn.addEventListener('click', () => {
+      setActiveTab(tabVerifiedBtn, tabVerifiedSection);
+      loadVerifiedInstruments();
+    });
+
+    tabComplaintsBtn.addEventListener('click', () => {
+      setActiveTab(tabComplaintsBtn, tabComplaintsSection);
+      loadComplaints();
+    });
+
+    // Load Overview Stats
+    async function loadStats() {
+      try {
+        const stats = await api('/api/applications/stats');
+        document.getElementById('statPending').textContent = stats.pending || 0;
+        document.getElementById('statVerified').textContent = stats.verified || 0;
+        document.getElementById('statExpired').textContent = stats.red || 0;
+        document.getElementById('statComplaints').textContent = stats.complaints || 0;
+        document.getElementById('badgePendingCount').textContent = stats.pending || 0;
+        document.getElementById('badgeComplaintsCount').textContent = stats.complaints || 0;
+      } catch (err) {
+        console.error('Stats error:', err);
+      }
+    }
+
+    // Load Pending Applications
+    async function loadPendingApplications() {
+      const container = document.getElementById('pendingListContainer');
+      container.innerHTML = `
+        <div class="text-center py-10 text-slate-400 text-sm">
+          <span class="animate-spin inline-block text-xl mb-1">⏳</span>
+          <p>Loading pending verification requests...</p>
+        </div>
+      `;
+
+      try {
+        const data = await api('/api/applications/pending');
+        pendingList = data.applications || [];
+        document.getElementById('badgePendingCount').textContent = pendingList.length;
+
+        if (pendingList.length === 0) {
+          container.innerHTML = `
+            <div class="text-center py-12">
+              <div class="text-4xl mb-2">🎉</div>
+              <h4 class="font-bold text-navy text-sm">No Pending Applications</h4>
+              <p class="text-xs text-slate-400 mt-1">All commercial instruments have been processed.</p>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = pendingList.map((app) => `
+          <div class="py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 indicator-border-pending pl-4 pr-2 hover:bg-slate-50 transition-colors rounded-r-xl">
+            <div class="flex items-start gap-4">
+              <img src="${fileUrl(app.photo)}" alt="${escapeHtml(app.instrumentName)}"
+                class="w-16 h-16 rounded-xl object-cover border border-slate-200 shadow-sm flex-shrink-0">
+              <div>
+                <div class="flex items-center gap-2">
+                  <h4 class="font-bold text-navy text-sm">${escapeHtml(app.instrumentName)}</h4>
+                  <span class="text-xs font-semibold px-2 py-0.5 rounded-full status-pill-pending">Awaiting Inspection</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-0.5">
+                  Owner: <strong>${escapeHtml(app.ownerName)}</strong> &bull; Shop: <strong>${escapeHtml(app.shopName)}</strong>
+                </p>
+                <div class="text-[11px] text-slate-400 mt-1 space-x-2">
+                  <span>Category: <strong>${escapeHtml(app.category)}</strong></span>
+                  ${app.serialNumber ? `<span>&bull; Serial: ${escapeHtml(app.serialNumber)}</span>` : ''}
+                  ${app.capacity ? `<span>&bull; Capacity: ${escapeHtml(app.capacity)}</span>` : ''}
+                </div>
+              </div>
+            </div>
+
+            <button type="button" class="inspect-btn bg-navy hover:bg-navy-light text-gold font-bold px-4 py-2 rounded-xl text-xs transition-colors shadow flex items-center gap-1.5"
+              data-id="${app.id}">
+              <span>🔍 Inspect &amp; Approve</span>
+            </button>
+          </div>
+        `).join('');
+
+        document.querySelectorAll('.inspect-btn').forEach((btn) => {
+          btn.addEventListener('click', () => openReviewModal(btn.dataset.id));
+        });
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    // Open Review Modal
+    function openReviewModal(appId, sourceList) {
+      const list = sourceList || pendingList;
+      const app = list.find((a) => a.id === appId);
+      if (!app) return;
+
+      currentAppId = appId;
+      document.getElementById('revOwnerName').textContent = app.ownerName;
+      document.getElementById('revShopName').textContent = app.shopName;
+      document.getElementById('revShopAddress').textContent = app.shopAddress;
+      document.getElementById('revPhone').textContent = app.phone;
+      document.getElementById('revInstName').textContent = app.instrumentName;
+      document.getElementById('revCategory').textContent = app.category;
+      document.getElementById('revSerialCapacity').textContent = `${app.serialNumber || 'N/A'} • ${app.capacity || 'Standard'}`;
+      document.getElementById('revPhoto').src = fileUrl(app.photo);
+      document.getElementById('revObservations').value = app.observations || 'Physically inspected conforming to Legal Metrology Standards.';
+      document.querySelector('input[name="revResult"][value="Pass"]').checked = true;
+      // Reset inspection scheduling fields
+      document.getElementById('inspectionDateInput').value = app.inspectionDate ? new Date(app.inspectionDate).toISOString().split('T')[0] : '';
+      document.getElementById('inspectionNotesInput').value = app.inspectionNotes || '';
+
+      openModal('reviewModal');
+    }
+
+    // Approve Action
+    document.getElementById('approveActionBtn').addEventListener('click', async () => {
+      if (!currentAppId) return;
+      const result = document.querySelector('input[name="revResult"]:checked').value;
+      if (result === 'Fail') {
+        showToast('To approve, verification finding must be "Pass". Otherwise click Reject.', 'warning');
+        return;
+      }
+
+      const observations = document.getElementById('revObservations').value.trim();
+      const btn = document.getElementById('approveActionBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span>⏳ Issuing Certificate &amp; QR...</span>';
+
+      try {
+        const res = await api(`/api/applications/${currentAppId}/approve`, {
+          method: 'POST',
+          body: {
+            verificationResult: 'Pass',
+            observations,
+          },
+        });
+
+        showToast(`Instrument approved! Certificate ${res.application.certificateId} & QR Code generated.`, 'success');
+        closeModal('reviewModal');
+        currentAppId = null;
+        loadPendingApplications();
+        loadStats();
+      } catch (err) {
+        showToast(err.message || 'Approval failed', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>✨ Approve &amp; Generate QR Certificate</span>';
+      }
+    });
+
+    // Reject Action
+    document.getElementById('rejectActionBtn').addEventListener('click', async () => {
+      if (!currentAppId) return;
+      const observations = document.getElementById('revObservations').value.trim();
+      if (!observations) {
+        showToast('Please state the reasons for rejection in observations.', 'warning');
+        return;
+      }
+
+      const btn = document.getElementById('rejectActionBtn');
+      btn.disabled = true;
+
+      try {
+        await api(`/api/applications/${currentAppId}/reject`, {
+          method: 'POST',
+          body: { observations },
+        });
+
+        showToast('Application rejected.', 'info');
+        closeModal('reviewModal');
+        currentAppId = null;
+        loadPendingApplications();
+        loadPhysicalInspections();
+        loadStats();
+      } catch (err) {
+        showToast(err.message || 'Rejection failed', 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // Schedule Physical Inspection Action
+    document.getElementById('scheduleInspectBtn').addEventListener('click', async () => {
+      if (!currentAppId) return;
+      const inspectionDate = document.getElementById('inspectionDateInput').value;
+      const inspectionNotes = document.getElementById('inspectionNotesInput').value.trim();
+
+      if (!inspectionDate) {
+        showToast('Please select a scheduled visit date.', 'warning');
+        return;
+      }
+
+      const btn = document.getElementById('scheduleInspectBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Scheduling...';
+
+      try {
+        const res = await api(`/api/applications/${currentAppId}/inspect`, {
+          method: 'POST',
+          body: { inspectionDate, inspectionNotes },
+        });
+
+        showToast(res.message || 'Physical inspection scheduled successfully!', 'success');
+        closeModal('reviewModal');
+        currentAppId = null;
+        loadPendingApplications();
+        loadPhysicalInspections();
+        // Update badge
+        const badge = document.getElementById('badgeInspectionsCount');
+        badge.classList.remove('hidden');
+        badge.textContent = parseInt(badge.textContent || '0') + 1;
+        loadStats();
+      } catch (err) {
+        showToast(err.message || 'Could not schedule inspection', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '📅 Confirm Physical Inspection Schedule';
+      }
+    });
+
+    // Load Physical Inspections
+    async function loadPhysicalInspections() {
+      const container = document.getElementById('inspectionsListContainer');
+      container.innerHTML = '<div class="text-center py-8 text-slate-400 text-sm">Loading scheduled inspections...</div>';
+
+      try {
+        const data = await api('/api/applications/inspections');
+        const inspections = data.applications || [];
+
+        const badge = document.getElementById('badgeInspectionsCount');
+        if (inspections.length > 0) {
+          badge.classList.remove('hidden');
+          badge.textContent = inspections.length;
+        } else {
+          badge.classList.add('hidden');
+        }
+
+        if (inspections.length === 0) {
+          container.innerHTML = `
+            <div class="text-center py-12">
+              <div class="text-4xl mb-2">✅</div>
+              <h4 class="font-bold text-navy text-sm">No Pending Physical Inspections</h4>
+              <p class="text-xs text-slate-400 mt-1">All scheduled site visits have been processed.</p>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = inspections.map((app) => `
+          <div class="py-4 px-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 hover:bg-amber-50 transition-colors rounded-xl border-l-4 border-amber-400 mb-2">
+            <div class="flex items-start gap-4">
+              <img src="${fileUrl(app.photo)}" alt="${escapeHtml(app.instrumentName)}"
+                class="w-16 h-16 rounded-xl object-cover border border-slate-200 shadow-sm flex-shrink-0">
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h4 class="font-bold text-navy text-sm">${escapeHtml(app.instrumentName)}</h4>
+                  <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">🔎 Physical Inspection</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-0.5">
+                  Owner: <strong>${escapeHtml(app.ownerName)}</strong> &bull; <strong>${escapeHtml(app.shopName)}</strong>
+                </p>
+                <p class="text-xs text-slate-400 mt-0.5">${escapeHtml(app.shopAddress)}</p>
+                <div class="mt-1 flex flex-wrap gap-3 text-[11px]">
+                  <span class="bg-amber-50 border border-amber-200 text-amber-800 px-2 py-0.5 rounded-lg">
+                    📅 Visit: <strong>${app.inspectionDate ? new Date(app.inspectionDate).toLocaleDateString() : 'TBD'}</strong>
+                  </span>
+                  ${app.inspectionNotes ? `<span class="text-slate-500">📝 ${escapeHtml(app.inspectionNotes)}</span>` : ''}
+                </div>
+              </div>
+            </div>
+            <div class="flex gap-2 flex-shrink-0">
+              <button type="button" class="inspect-btn bg-navy hover:bg-navy-light text-gold font-bold px-4 py-2 rounded-xl text-xs shadow"
+                data-id="${app.id}">
+                ✅ Complete Review
+              </button>
+            </div>
+          </div>
+        `).join('');
+
+        container.querySelectorAll('.inspect-btn').forEach((btn) => {
+          btn.addEventListener('click', () => openReviewModal(btn.dataset.id, inspections));
+        });
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    // Load Verified Instruments & Alerts
+    let currentVFilter = 'all';
+    async function loadVerifiedInstruments() {
+      const container = document.getElementById('verifiedListContainer');
+      container.innerHTML = '<div class="text-center py-8 text-slate-400 text-sm">Loading verified registry...</div>';
+
+      try {
+        const data = await api('/api/applications/alerts');
+        verifiedList = data.applications || [];
+        renderVerifiedList();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    function renderVerifiedList() {
+      const container = document.getElementById('verifiedListContainer');
+      let filtered = verifiedList;
+
+      if (currentVFilter !== 'all') {
+        filtered = verifiedList.filter((app) => {
+          const status = getRenewalStatus(app.expiryDate);
+          return status.level === currentVFilter;
+        });
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div class="text-center py-10 text-slate-400 text-sm">No verified instruments in this category.</div>';
+        return;
+      }
+
+      container.innerHTML = filtered.map((app) => {
+        const renewalStatus = getRenewalStatus(app.expiryDate);
+        return `
+          <div class="py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 ${renewalStatus.borderClass} pl-4 pr-2 hover:bg-slate-50 transition-colors rounded-r-xl">
+            <div>
+              <div class="flex items-center gap-2">
+                <h4 class="font-bold text-navy text-sm">${escapeHtml(app.instrumentName)}</h4>
+                <span class="text-xs font-bold px-2.5 py-0.5 rounded-full ${renewalStatus.badgeClass}">${renewalStatus.label}</span>
+              </div>
+              <p class="text-xs text-slate-600 mt-0.5">
+                Owner: <strong>${escapeHtml(app.ownerName)}</strong> &bull; Shop: <strong>${escapeHtml(app.shopName)}</strong> &bull; ${escapeHtml(app.shopAddress)}
+              </p>
+              <div class="text-xs mt-1 space-x-3 text-slate-500">
+                <span class="font-mono text-navy font-semibold">Cert: ${escapeHtml(app.certificateId)}</span>
+                <span>Verified: ${formatDate(app.verificationDate)}</span>
+                <span class="font-semibold ${renewalStatus.level === 'red' ? 'text-red-600' : 'text-slate-700'}">Expiry: ${formatDate(app.expiryDate)}</span>
+              </div>
+            </div>
+
+            <a href="verify.html?code=${encodeURIComponent(app.certificateId)}" target="_blank"
+              class="text-xs bg-slate-100 hover:bg-slate-200 text-navy font-bold px-3 py-1.5 rounded-lg border border-slate-200 flex items-center gap-1">
+              <span>🔍 Public QR Link &rarr;</span>
+            </a>
+          </div>
+        `;
+      }).join('');
+    }
+
+    document.querySelectorAll('.verified-filter').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.verified-filter').forEach((b) => {
+          b.className = 'verified-filter bg-slate-100 text-slate-700 px-3 py-1 rounded-lg';
+        });
+        btn.className = 'verified-filter active bg-navy text-white px-3 py-1 rounded-lg';
+        currentVFilter = btn.dataset.vfilter;
+        renderVerifiedList();
+      });
+    });
+
+    // Load Citizen Complaints
+    async function loadComplaints() {
+      const container = document.getElementById('complaintsListContainer');
+      container.innerHTML = '<div class="text-center py-8 text-slate-400 text-sm">Loading complaints from citizens...</div>';
+
+      const filterStatus = document.getElementById('complaintFilterSelect').value;
+      const query = filterStatus !== 'All' ? `?status=${encodeURIComponent(filterStatus)}` : '';
+
+      try {
+        const data = await api(`/api/complaints${query}`);
+        complaintsList = data.complaints || [];
+        document.getElementById('badgeComplaintsCount').textContent = complaintsList.length;
+
+        if (complaintsList.length === 0) {
+          container.innerHTML = `
+            <div class="text-center py-12">
+              <div class="text-4xl mb-2">🛡️</div>
+              <h4 class="font-bold text-navy text-sm">No Complaints Filed</h4>
+              <p class="text-xs text-slate-400 mt-1">No citizen reports recorded matching this status.</p>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = complaintsList.map((c) => {
+          const badgeColors = {
+            Pending: 'bg-red-100 text-red-800 border-red-300',
+            'Under Review': 'bg-amber-100 text-amber-800 border-amber-300',
+            'Action Taken': 'bg-blue-100 text-blue-800 border-blue-300',
+            Resolved: 'bg-green-100 text-green-800 border-green-300',
+            Dismissed: 'bg-slate-100 text-slate-700 border-slate-300',
+          };
+
+          return `
+            <div class="py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-l-4 border-red-500 pl-4 pr-2 hover:bg-slate-50 transition-colors rounded-r-xl">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="font-mono font-bold text-xs text-red-700">${escapeHtml(c.complaintNumber || 'CMP')}</span>
+                  <span class="text-xs font-bold px-2 py-0.5 rounded-full border ${badgeColors[c.status] || ''}">${c.status}</span>
+                  <span class="text-xs text-slate-400">&bull; ${formatDate(c.createdAt)}</span>
+                </div>
+                <h4 class="font-bold text-navy text-sm mt-1">
+                  Accused: ${escapeHtml(c.sellerName)} ${c.shopName ? `(${escapeHtml(c.shopName)})` : ''}
+                </h4>
+                <p class="text-xs text-slate-600">Location: ${escapeHtml(c.shopAddress)}</p>
+                <p class="text-xs text-red-700 font-semibold mt-1">Violation: ${escapeHtml(c.violationType || 'Unspecified')}</p>
+                <p class="text-xs text-slate-500 italic mt-0.5 line-clamp-1">"${escapeHtml(c.description)}"</p>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <button type="button" class="view-cmp-btn bg-red-700 hover:bg-red-800 text-white font-bold px-4 py-2 rounded-xl text-xs transition-colors shadow flex items-center gap-1.5"
+                  data-id="${c.id}">
+                  <span>🚨 Inspect Grievance</span>
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        document.querySelectorAll('.view-cmp-btn').forEach((btn) => {
+          btn.addEventListener('click', () => openComplaintModal(btn.dataset.id));
+        });
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    document.getElementById('complaintFilterSelect').addEventListener('change', () => {
+      loadComplaints();
+    });
+
+    // Open Complaint Investigation Modal
+    function openComplaintModal(cmpId) {
+      const cmp = complaintsList.find((c) => c.id === cmpId);
+      if (!cmp) return;
+
+      currentComplaintId = cmpId;
+      document.getElementById('cmpModalNumber').textContent = cmp.complaintNumber || 'CMP';
+      document.getElementById('cmpModalDate').textContent = formatDate(cmp.createdAt);
+      document.getElementById('cmpModalSeller').textContent = cmp.sellerName;
+      document.getElementById('cmpModalShop').textContent = cmp.shopName || 'Shop name not provided';
+      document.getElementById('cmpModalAddress').textContent = cmp.shopAddress;
+      document.getElementById('cmpModalComplainant').textContent = cmp.complainantName;
+      document.getElementById('cmpModalPhone').textContent = `📞 ${cmp.complainantPhone}`;
+      document.getElementById('cmpModalEmail').textContent = cmp.complainantEmail ? `✉️ ${cmp.complainantEmail}` : '';
+      document.getElementById('cmpModalViolation').textContent = cmp.violationType || 'Expired Machine / No Renewal';
+      document.getElementById('cmpModalDesc').textContent = cmp.description;
+      document.getElementById('cmpStatusSelect').value = cmp.status;
+      document.getElementById('cmpOfficerNotes').value = cmp.officerNotes || '';
+
+      const gallery = document.getElementById('cmpModalPhotosGallery');
+      if (cmp.photos && cmp.photos.length > 0) {
+        gallery.innerHTML = cmp.photos.map((p) => `
+          <a href="${fileUrl(p)}" target="_blank" class="block">
+            <img src="${fileUrl(p)}" alt="Evidence" class="h-24 w-24 object-cover rounded-lg border border-slate-300 hover:opacity-90 shadow-sm">
+          </a>
+        `).join('');
+      } else {
+        gallery.innerHTML = '<span class="text-xs text-slate-400">No photos uploaded.</span>';
+      }
+
+      openModal('complaintModal');
+    }
+
+    // Save Complaint Status
+    document.getElementById('saveComplaintBtn').addEventListener('click', async () => {
+      if (!currentComplaintId) return;
+      const status = document.getElementById('cmpStatusSelect').value;
+      const officerNotes = document.getElementById('cmpOfficerNotes').value.trim();
+      const btn = document.getElementById('saveComplaintBtn');
+
+      btn.disabled = true;
+      try {
+        await api(`/api/complaints/${currentComplaintId}`, {
+          method: 'PATCH',
+          body: { status, officerNotes },
+        });
+
+        showToast('Complaint investigation status updated successfully.', 'success');
+        closeModal('complaintModal');
+        currentComplaintId = null;
+        loadComplaints();
+        loadStats();
+      } catch (err) {
+        showToast(err.message || 'Failed to update complaint', 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // Initial load
+    loadStats();
+    loadPendingApplications();
+  </script>
+</body>
+</html>

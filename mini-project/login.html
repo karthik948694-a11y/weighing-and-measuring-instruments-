@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login & Registration | Legal Metrology Verification System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/tailwind-config.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="min-h-screen flex flex-col bg-slate-50 text-slate-800">
+
+  <div id="navbar-container"></div>
+
+  <main class="flex-1 py-12 px-4 flex items-center justify-center">
+    <div class="w-full max-w-lg">
+
+      <!-- Header Card -->
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-navy text-gold text-3xl shadow-md mb-3">
+          ⚖️
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-navy">Legal Metrology Portal</h1>
+        <p class="text-slate-500 text-xs sm:text-sm mt-1">
+          Government Weighing &amp; Measuring Instrument Management System
+        </p>
+      </div>
+
+      <!-- Main Auth Box -->
+      <div class="bg-white rounded-2xl shadow-xl border border-slate-200/80 overflow-hidden">
+        <!-- Auth Tabs -->
+        <div class="flex border-b border-slate-200 bg-slate-50 text-sm font-semibold">
+          <button type="button" id="tabLogin"
+            class="flex-1 py-3.5 text-center text-navy border-b-2 border-gold bg-white transition-all">
+            Sign In
+          </button>
+          <button type="button" id="tabRegister"
+            class="flex-1 py-3.5 text-center text-slate-500 hover:text-navy border-b-2 border-transparent transition-all">
+            Register Business / Seller
+          </button>
+        </div>
+
+        <div class="p-6 sm:p-8">
+          <!-- LOGIN FORM -->
+          <form id="loginForm" class="space-y-4">
+            <div>
+              <label for="loginEmail" class="block text-xs font-bold text-navy uppercase tracking-wider mb-1">
+                Official Email Address
+              </label>
+              <input type="email" id="loginEmail" required placeholder="e.g. owner@store.com or officer@lmvs.gov"
+                class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold">
+            </div>
+
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <label for="loginPassword" class="block text-xs font-bold text-navy uppercase tracking-wider">
+                  Password
+                </label>
+              </div>
+              <input type="password" id="loginPassword" required placeholder="Enter password (min 6 characters)"
+                class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold">
+            </div>
+
+            <button type="submit" id="loginSubmitBtn"
+              class="w-full bg-navy hover:bg-navy-light text-gold font-bold py-3 rounded-xl transition-all shadow-md hover:shadow-lg text-sm mt-2 flex items-center justify-center gap-2">
+              <span>Sign In to Portal &rarr;</span>
+            </button>
+
+            <!-- Quick Demo Credential Buttons -->
+            <div class="pt-5 border-t border-slate-100 mt-5">
+              <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider text-center mb-2.5">
+                Quick Demo Access (Click to Fill &amp; Test)
+              </p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <button type="button" id="demoOfficerBtn"
+                  class="bg-slate-100 hover:bg-slate-200 text-navy font-semibold px-3 py-2 rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5 border border-slate-200">
+                  <span>👮 Fill Officer Login</span>
+                </button>
+                <button type="button" id="demoOwnerBtn"
+                  class="bg-slate-100 hover:bg-slate-200 text-navy font-semibold px-3 py-2 rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5 border border-slate-200">
+                  <span>🏭 Fill Demo Seller</span>
+                </button>
+              </div>
+              <p class="text-[11px] text-slate-400 text-center mt-2">
+                Default Officer: <code class="text-navy font-mono">officer@lmvs.gov</code> / <code class="text-navy font-mono">Officer@123</code>
+              </p>
+            </div>
+          </form>
+
+          <!-- REGISTRATION FORM -->
+          <form id="registerForm" class="space-y-4 hidden">
+            <div>
+              <label for="regName" class="block text-xs font-bold text-navy uppercase tracking-wider mb-1">
+                Owner / Authorized Person Name *
+              </label>
+              <input type="text" id="regName" required placeholder="e.g. Ramesh Kumar"
+                class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label for="regEmail" class="block text-xs font-bold text-navy uppercase tracking-wider mb-1">
+                  Email Address *
+                </label>
+                <input type="email" id="regEmail" required placeholder="ramesh@retail.com"
+                  class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold">
+              </div>
+              <div>
+                <label for="regPhone" class="block text-xs font-bold text-navy uppercase tracking-wider mb-1">
+                  Phone Number *
+                </label>
+                <input type="tel" id="regPhone" required placeholder="+91 98765 43210"
+                  class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold">
+              </div>
+            </div>
+
+            <div>
+              <label for="regShopName" class="block text-xs font-bold text-navy uppercase tracking-wider mb-1">
+                Business / Enterprise / Shop Name *
+              </label>
+              <input type="text" id="regShopName" required placeholder="e.g. Ramesh Provisions & Weighing Center"
+                class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold">
+            </div>
+
+            <div>
+              <label for="regShopAddress" class="block text-xs font-bold text-navy uppercase tracking-wider mb-1">
+                Shop / Establishment Address *
+              </label>
+              <textarea id="regShopAddress" rows="2" required placeholder="Shop #12, Market Road, Ward 4..."
+                class="w-full border border-slate-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold"></textarea>
+            </div>
+
+            <div>
+              <label for="regPassword" class="block text-xs font-bold text-navy uppercase tracking-wider mb-1">
+                Password * (minimum 6 characters)
+              </label>
+              <input type="password" id="regPassword" required minlength="6" placeholder="Choose a secure password"
+                class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold">
+            </div>
+
+            <button type="submit" id="regSubmitBtn"
+              class="w-full bg-gold hover:bg-gold-light text-navy font-bold py-3 rounded-xl transition-all shadow-md text-sm mt-2 flex items-center justify-center gap-2">
+              <span>Create Business Account &rarr;</span>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Public Links -->
+      <div class="mt-6 text-center text-xs text-slate-500 space-x-3">
+        <a href="verify.html" class="hover:text-navy underline">🔍 Public Certificate Verification</a>
+        <span>&bull;</span>
+        <a href="complaint.html" class="hover:text-red-600 underline">📣 Report a Violation</a>
+      </div>
+
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+
+  <script src="js/script.js"></script>
+  <script>
+    initNavbar({ activePage: 'login' });
+    initFooter();
+
+    // Tab switching
+    const tabLogin = document.getElementById('tabLogin');
+    const tabRegister = document.getElementById('tabRegister');
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+
+    tabLogin.addEventListener('click', () => {
+      tabLogin.className = 'flex-1 py-3.5 text-center text-navy border-b-2 border-gold bg-white transition-all';
+      tabRegister.className = 'flex-1 py-3.5 text-center text-slate-500 hover:text-navy border-b-2 border-transparent transition-all';
+      loginForm.classList.remove('hidden');
+      registerForm.classList.add('hidden');
+    });
+
+    tabRegister.addEventListener('click', () => {
+      tabRegister.className = 'flex-1 py-3.5 text-center text-navy border-b-2 border-gold bg-white transition-all';
+      tabLogin.className = 'flex-1 py-3.5 text-center text-slate-500 hover:text-navy border-b-2 border-transparent transition-all';
+      registerForm.classList.remove('hidden');
+      loginForm.classList.add('hidden');
+    });
+
+    // Quick fill demo accounts
+    document.getElementById('demoOfficerBtn').addEventListener('click', () => {
+      document.getElementById('loginEmail').value = 'officer@lmvs.gov';
+      document.getElementById('loginPassword').value = 'Officer@123';
+      showToast('Prefilled Legal Metrology Officer credentials', 'info');
+    });
+
+    document.getElementById('demoOwnerBtn').addEventListener('click', () => {
+      document.getElementById('loginEmail').value = 'owner@example.com';
+      document.getElementById('loginPassword').value = 'Owner@123';
+      showToast('Prefilled Demo Seller credentials', 'info');
+    });
+
+    // Handle Login Submit
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const btn = document.getElementById('loginSubmitBtn');
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="animate-spin">⏳</span> Signing in...';
+
+      try {
+        const data = await api('/api/auth/login', {
+          method: 'POST',
+          body: { email, password },
+        });
+
+        setSession(data.token, data.user);
+        showToast(`Welcome back, ${data.user.name}!`, 'success');
+
+        setTimeout(() => {
+          if (data.user.role === 'Officer') {
+            window.location.href = 'officer-dashboard.html';
+          } else {
+            window.location.href = 'owner-dashboard.html';
+          }
+        }, 600);
+      } catch (err) {
+        showToast(err.message || 'Login failed', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<span>Sign In to Portal &rarr;</span>';
+      }
+    });
+
+    // Handle Register Submit
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const phone = document.getElementById('regPhone').value.trim();
+      const shopName = document.getElementById('regShopName').value.trim();
+      const shopAddress = document.getElementById('regShopAddress').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const btn = document.getElementById('regSubmitBtn');
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="animate-spin">⏳</span> Registering...';
+
+      try {
+        const data = await api('/api/auth/register', {
+          method: 'POST',
+          body: { name, email, phone, shopName, shopAddress, password },
+        });
+
+        setSession(data.token, data.user);
+        showToast('Business account registered successfully!', 'success');
+
+        setTimeout(() => {
+          window.location.href = 'owner-dashboard.html';
+        }, 600);
+      } catch (err) {
+        showToast(err.message || 'Registration failed', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<span>Create Business Account &rarr;</span>';
+      }
+    });
+  </script>
+</body>
+</html>
