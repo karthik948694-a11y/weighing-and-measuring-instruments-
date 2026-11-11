@@ -5,30 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Legal Metrology Officer Dashboard | LMVS</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="js/tailwind-config.js"></script>
-  <link rel="stylesheet" href="css/style.css">
+  <script src="tailwind-config.js"></script>
+  <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 </head>
-<body class="min-h-screen flex flex-col bg-slate-50 text-slate-800">
+<body class="min-h-screen flex flex-col bg-calibration-pattern text-slate-900 transition-colors duration-300">
 
   <div id="navbar-container"></div>
 
   <main class="flex-1 pb-16">
     <!-- Header -->
-    <div class="bg-gradient-to-r from-navy via-navy-light to-slate-900 text-white py-8 border-b border-navy-light shadow-md">
+    <div class="bg-gradient-to-r from-plum to-plum-dark text-white py-8 border-b border-white/10 shadow-lg">
       <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <div class="inline-flex items-center gap-2 bg-gold/20 text-gold text-xs font-semibold px-2.5 py-0.5 rounded-full mb-1">
-            <span>👮 Government Enforcement &amp; Verification Portal</span>
+          <div class="inline-flex items-center gap-2 bg-white/15 text-white/90 border border-plum/30 text-xs font-semibold px-3 py-1 rounded-full mb-2">
+            <span> Government Enforcement &amp; Verification Portal</span>
           </div>
           <h1 class="text-2xl sm:text-3xl font-extrabold text-white">
-            Officer Dashboard: <span id="officerName" class="text-gold">Inspector</span>
+            Officer Dashboard: <span id="officerName" class="text-white">Inspector</span>
           </h1>
-          <p class="text-xs text-slate-300 mt-1">Legal Metrology Department &bull; District Enforcement Division</p>
+          <p class="text-xs text-slate-300 mt-1">
+            Legal Metrology Department &bull; District Enforcement Division &bull; Official ID: <span id="officerIdBadge" class="font-mono font-bold text-milk bg-white/10 px-2 py-0.5 rounded border border-white/20">113iom20</span>
+          </p>
         </div>
         <div class="flex items-center gap-3">
-          <span class="text-xs bg-white/10 px-3 py-1.5 rounded-xl border border-white/20 text-slate-200">
-            🟢 System Active &amp; Ready
+          <span class="text-xs bg-emerald-500/20 text-emerald-300 px-3 py-1.5 rounded-xl border border-emerald-500/40 font-medium">
+             Enforcement System Active
           </span>
         </div>
       </div>
@@ -38,49 +40,61 @@
 
       <!-- Metrics Row -->
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
-          <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Pending Review</span>
-          <div id="statPending" class="text-2xl sm:text-3xl font-extrabold text-sky-700 mt-2">0</div>
+        <div class="glass-panel p-5 rounded-2xl shadow-sm border border-slate-200/90 card-interactive bg-white">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Pending Review</span>
+            <span class="w-2.5 h-2.5 rounded-full bg-sky-500 animate-pulse"></span>
+          </div>
+          <div id="statPending" class="text-2xl sm:text-3xl font-black text-sky-600 mt-2">0</div>
           <p class="text-[11px] text-slate-500 mt-1">Requires inspection</p>
         </div>
-        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
-          <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Verified</span>
-          <div id="statVerified" class="text-2xl sm:text-3xl font-extrabold text-green-700 mt-2">0</div>
+        <div class="glass-panel p-5 rounded-2xl shadow-sm border border-slate-200/90 card-interactive bg-white">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Verified</span>
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+          </div>
+          <div id="statVerified" class="text-2xl sm:text-3xl font-black text-emerald-600 mt-2">0</div>
           <p class="text-[11px] text-slate-500 mt-1">Active certificates</p>
         </div>
-        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
-          <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Overdue / Expired</span>
-          <div id="statExpired" class="text-2xl sm:text-3xl font-extrabold text-red-600 mt-2">0</div>
-          <p class="text-[11px] text-red-600 font-semibold mt-1">Notice required</p>
+        <div class="glass-panel p-5 rounded-2xl shadow-sm border border-slate-200/90 card-interactive bg-white">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Overdue / Expired</span>
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
+          </div>
+          <div id="statExpired" class="text-2xl sm:text-3xl font-black text-rose-600 mt-2">0</div>
+          <p class="text-[11px] text-rose-600 font-semibold mt-1">Notice required</p>
         </div>
-        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
-          <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Citizen Complaints</span>
-          <div id="statComplaints" class="text-2xl sm:text-3xl font-extrabold text-amber-600 mt-2">0</div>
-          <p class="text-[11px] text-amber-700 mt-1">Public reports filed</p>
+        <div class="glass-panel p-5 rounded-2xl shadow-sm border border-slate-200/90 card-interactive bg-white">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Citizen Complaints</span>
+            <span class="w-2.5 h-2.5 rounded-full bg-plum"></span>
+          </div>
+          <div id="statComplaints" class="text-2xl sm:text-3xl font-black text-plum mt-2">0</div>
+          <p class="text-[11px] text-plum-dark mt-1">Public reports filed</p>
         </div>
       </div>
 
       <!-- Main Navigation Tabs -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
-        <div class="flex border-b border-slate-200 bg-slate-50/70 text-xs sm:text-sm font-semibold">
+      <div class="glass-panel rounded-2xl shadow-sm border border-slate-200/90 overflow-hidden bg-white">
+        <div class="flex border-b border-slate-200 bg-slate-50/80 text-xs sm:text-sm font-semibold">
           <button type="button" id="tabPendingBtn"
-            class="tab-btn flex-1 py-3.5 text-center text-navy border-b-2 border-gold bg-white transition-all flex items-center justify-center gap-2">
-            <span>📋 Pending</span>
-            <span id="badgePendingCount" class="bg-navy text-gold text-xs px-2 py-0.5 rounded-full">0</span>
+            class="tab-btn flex-1 py-3.5 text-center text-slate-900 border-b-2 border-plum bg-white font-bold transition-all flex items-center justify-center gap-2">
+            <span> Pending</span>
+            <span id="badgePendingCount" class="bg-white/15 text-plum-dark text-xs px-2.5 py-0.5 rounded-full font-bold">0</span>
           </button>
           <button type="button" id="tabInspectionsBtn"
-            class="tab-btn flex-1 py-3.5 text-center text-slate-500 hover:text-navy border-b-2 border-transparent transition-all flex items-center justify-center gap-2">
-            <span>🔎 Physical Inspections</span>
-            <span id="badgeInspectionsCount" class="bg-amber-500 text-white text-xs px-2 py-0.5 rounded-full hidden">0</span>
+            class="tab-btn flex-1 py-3.5 text-center text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition-all flex items-center justify-center gap-2">
+            <span> Physical Inspections</span>
+            <span id="badgeInspectionsCount" class="bg-plum text-white font-bold text-xs px-2 py-0.5 rounded-full hidden">0</span>
           </button>
           <button type="button" id="tabVerifiedBtn"
-            class="tab-btn flex-1 py-3.5 text-center text-slate-500 hover:text-navy border-b-2 border-transparent transition-all flex items-center justify-center gap-2">
-            <span>🛡️ Verified &amp; Alerts</span>
+            class="tab-btn flex-1 py-3.5 text-center text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition-all flex items-center justify-center gap-2">
+            <span> Verified &amp; Alerts</span>
           </button>
           <button type="button" id="tabComplaintsBtn"
-            class="tab-btn flex-1 py-3.5 text-center text-slate-500 hover:text-navy border-b-2 border-transparent transition-all flex items-center justify-center gap-2">
-            <span>📢 Complaints</span>
-            <span id="badgeComplaintsCount" class="bg-red-600 text-white text-xs px-2 py-0.5 rounded-full">0</span>
+            class="tab-btn flex-1 py-3.5 text-center text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition-all flex items-center justify-center gap-2">
+            <span> Complaints</span>
+            <span id="badgeComplaintsCount" class="bg-rose-600 text-white text-xs px-2 py-0.5 rounded-full font-bold">0</span>
           </button>
         </div>
 
@@ -88,17 +102,17 @@
         <div id="tabPendingSection" class="p-6">
           <div class="flex justify-between items-center mb-4">
             <div>
-              <h3 class="font-bold text-navy text-base">Commercial Instrument Applications Awaiting Approval</h3>
-              <p class="text-xs text-slate-500">Review machine specifications, inspect uploaded photo, and issue QR certification</p>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base">Commercial Instrument Applications Awaiting Approval</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Review machine specifications, inspect uploaded photo, and issue QR certification</p>
             </div>
-            <button type="button" onclick="loadPendingApplications()" class="text-xs bg-slate-100 hover:bg-slate-200 text-navy font-semibold px-3 py-1.5 rounded-lg border border-slate-200">
-              🔄 Refresh
+            <button type="button" onclick="loadPendingApplications()" class="text-xs bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 transition-colors">
+               Refresh
             </button>
           </div>
 
-          <div id="pendingListContainer" class="divide-y divide-slate-100">
+          <div id="pendingListContainer" class="divide-y divide-slate-100 dark:divide-slate-800">
             <div class="text-center py-10 text-slate-400 text-sm">
-              <span class="animate-spin inline-block text-xl mb-1">⏳</span>
+              <span class="animate-spin inline-block text-xl mb-1"></span>
               <p>Loading pending verification requests...</p>
             </div>
           </div>
@@ -108,16 +122,16 @@
         <div id="tabInspectionsSection" class="p-6 hidden">
           <div class="flex justify-between items-center mb-4">
             <div>
-              <h3 class="font-bold text-navy text-base">🔎 Scheduled Physical Inspections</h3>
-              <p class="text-xs text-slate-500">Applications that require on-site visit before approval or rejection</p>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base"> Scheduled Physical Inspections</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Applications that require on-site visit before approval or rejection</p>
             </div>
-            <button type="button" onclick="loadPhysicalInspections()" class="text-xs bg-slate-100 hover:bg-slate-200 text-navy font-semibold px-3 py-1.5 rounded-lg border border-slate-200">
-              🔄 Refresh
+            <button type="button" onclick="loadPhysicalInspections()" class="text-xs bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 transition-colors">
+               Refresh
             </button>
           </div>
-          <div id="inspectionsListContainer" class="divide-y divide-slate-100">
+          <div id="inspectionsListContainer" class="divide-y divide-slate-100 dark:divide-slate-800">
             <div class="text-center py-10 text-slate-400 text-sm">
-              <span class="text-2xl mb-2 block">🔎</span>
+              <span class="text-2xl mb-2 block"></span>
               <p>No physical inspections scheduled yet.</p>
             </div>
           </div>
@@ -127,18 +141,18 @@
         <div id="tabVerifiedSection" class="p-6 hidden">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
             <div>
-              <h3 class="font-bold text-navy text-base">Verified Instruments Registry</h3>
-              <p class="text-xs text-slate-500">Monitor traffic-light renewal statuses across all licensed commercial entities</p>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base">Verified Instruments Registry</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Monitor traffic-light renewal statuses across all licensed commercial entities</p>
             </div>
             <div class="flex items-center gap-2 text-xs">
-              <button type="button" class="verified-filter active bg-navy text-white px-3 py-1 rounded-lg" data-vfilter="all">All</button>
-              <button type="button" class="verified-filter bg-slate-100 text-slate-700 px-3 py-1 rounded-lg" data-vfilter="green">🟢 Valid</button>
-              <button type="button" class="verified-filter bg-slate-100 text-slate-700 px-3 py-1 rounded-lg" data-vfilter="yellow">🟡 Due Soon</button>
-              <button type="button" class="verified-filter bg-slate-100 text-slate-700 px-3 py-1 rounded-lg" data-vfilter="red">🔴 Overdue</button>
+              <button type="button" class="verified-filter active btn-primary px-3 py-1 rounded-lg text-xs font-bold shadow" data-vfilter="all">All</button>
+              <button type="button" class="verified-filter bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white px-3 py-1 rounded-lg text-xs font-semibold" data-vfilter="green"> Valid</button>
+              <button type="button" class="verified-filter bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white px-3 py-1 rounded-lg text-xs font-semibold" data-vfilter="yellow"> Due Soon</button>
+              <button type="button" class="verified-filter bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white px-3 py-1 rounded-lg text-xs font-semibold" data-vfilter="red"> Overdue</button>
             </div>
           </div>
 
-          <div id="verifiedListContainer" class="divide-y divide-slate-100">
+          <div id="verifiedListContainer" class="divide-y divide-slate-100 dark:divide-slate-800">
             <!-- Dynamic verified items -->
           </div>
         </div>
@@ -147,11 +161,11 @@
         <div id="tabComplaintsSection" class="p-6 hidden">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
             <div>
-              <h3 class="font-bold text-navy text-base">Citizen Grievances &amp; Non-Compliance Reports</h3>
-              <p class="text-xs text-slate-500">Complaints lodged by consumers regarding unrenewed, uncalibrated, or tampered machines</p>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base">Citizen Grievances &amp; Non-Compliance Reports</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Complaints lodged by consumers regarding unrenewed, uncalibrated, or tampered machines</p>
             </div>
             <div class="flex items-center gap-2 text-xs">
-              <select id="complaintFilterSelect" class="border border-slate-300 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-gold font-medium">
+              <select id="complaintFilterSelect" class="border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-plum font-medium">
                 <option value="All">All Statuses</option>
                 <option value="Pending">Pending Review</option>
                 <option value="Under Review">Under Review</option>
@@ -174,39 +188,46 @@
 
   <!-- Review Application Modal -->
   <div id="reviewModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto border border-slate-200 my-8">
-      <div class="bg-navy text-gold font-bold px-6 py-4 flex items-center justify-between sticky top-0 z-10 shadow">
-        <h3 class="text-base font-bold flex items-center gap-2">
-          <span>🔍</span> Inspection &amp; Approval Evaluation
+    <div class="glass-panel rounded-2xl shadow-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto border border-slate-200/90 my-8 bg-white">
+      <div class="bg-plum text-white font-bold px-6 py-4 flex items-center justify-between sticky top-0 z-10 border-b border-white/10 shadow-lg">
+        <h3 class="text-base font-bold flex items-center gap-2 text-white">
+          <span class="text-white"></span> Inspection &amp; Approval Evaluation
         </h3>
-        <button type="button" data-close-modal class="text-white/70 hover:text-white text-2xl font-bold">&times;</button>
+        <button type="button" data-close-modal class="text-slate-400 hover:text-white text-2xl font-bold leading-none">&times;</button>
       </div>
 
       <div class="p-6 space-y-4">
         <!-- Business & Instrument Info -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs bg-slate-50 p-4 rounded-xl border border-slate-200">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs bg-milk-deep/60 p-4 rounded-xl border border-milk-line">
           <div>
-            <span class="text-slate-400 font-bold uppercase text-[10px] block">Business Owner</span>
-            <p id="revOwnerName" class="font-bold text-navy text-sm mt-0.5"></p>
+            <span class="text-slate-500 font-bold uppercase text-[10px] block">Machine Holder Name</span>
+            <p id="revOwnerName" class="font-bold text-slate-900 text-sm mt-0.5"></p>
           </div>
           <div>
-            <span class="text-slate-400 font-bold uppercase text-[10px] block">Shop / Enterprise</span>
-            <p id="revShopName" class="font-semibold text-slate-700 mt-0.5"></p>
+            <span class="text-slate-500 font-bold uppercase text-[10px] block">Aadhaar Number (UIDAI)</span>
+            <p id="revAadhaarNo" class="font-bold text-plum font-mono text-sm mt-0.5 flex items-center gap-1.5">
+              <span id="revAadhaarText">5432 1098 7654</span>
+              <span class="text-[9px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-sans font-semibold">Verified</span>
+            </p>
           </div>
           <div>
-            <span class="text-slate-400 font-bold uppercase text-[10px] block">Shop Address</span>
-            <p id="revShopAddress" class="text-slate-600 mt-0.5"></p>
+            <span class="text-slate-500 font-bold uppercase text-[10px] block">Shop / Commercial Enterprise</span>
+            <p id="revShopName" class="font-semibold text-slate-800 mt-0.5"></p>
           </div>
           <div>
-            <span class="text-slate-400 font-bold uppercase text-[10px] block">Owner Phone</span>
-            <p id="revPhone" class="text-slate-600 mt-0.5"></p>
+            <span class="text-slate-500 font-bold uppercase text-[10px] block">Contact Phone</span>
+            <p id="revPhone" class="text-slate-700 mt-0.5 font-medium"></p>
+          </div>
+          <div class="sm:col-span-2">
+            <span class="text-slate-500 font-bold uppercase text-[10px] block">Establishment Address</span>
+            <p id="revShopAddress" class="text-slate-700 mt-0.5"></p>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs bg-slate-50 p-3.5 rounded-xl border border-slate-200">
           <div>
-            <span class="text-slate-400 font-bold uppercase text-[10px] block">Instrument Name</span>
-            <p id="revInstName" class="font-bold text-navy mt-0.5"></p>
+            <span class="text-slate-400 font-bold uppercase text-[10px] block">Instrument Model</span>
+            <p id="revInstName" class="font-bold text-slate-900 mt-0.5"></p>
           </div>
           <div>
             <span class="text-slate-400 font-bold uppercase text-[10px] block">Category</span>
@@ -218,73 +239,94 @@
           </div>
         </div>
 
-        <!-- Uploaded Photo -->
+        <!-- Uploaded Photo Proof -->
         <div>
-          <span class="text-slate-400 font-bold uppercase text-[10px] block mb-1">Uploaded Machine Photo for Verification</span>
-          <div class="bg-slate-100 rounded-xl p-2 border border-slate-200 flex justify-center">
-            <img id="revPhoto" src="" alt="Machine photo" class="max-h-56 rounded-lg object-contain shadow-sm">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-slate-700 font-bold uppercase text-[11px] block">
+              Uploaded Machine Photo &amp; Stamping Proof *
+            </span>
+            <a id="revPhotoLink" href="#" target="_blank" class="text-[11px] text-plum hover:underline font-bold flex items-center gap-1">
+              <span>View Full Image &rarr;</span>
+            </a>
+          </div>
+          <div class="bg-milk-deep rounded-xl p-3 border border-plum/20 flex justify-center">
+            <img id="revPhoto" src="" alt="Machine photo" class="max-h-64 rounded-lg object-contain shadow-md border border-milk-line bg-white">
           </div>
         </div>
 
+
+        <!-- Video Proof Player (shown only when video exists) -->
+        <div id="revVideoContainer" class="hidden">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-slate-700 font-bold uppercase text-[11px] block">
+              Uploaded Video Proof
+            </span>
+          </div>
+          <div class="bg-milk-deep rounded-xl p-3 border border-plum/20 flex justify-center">
+            <video id="revVideo" controls class="max-h-64 max-w-full rounded-lg shadow-md border border-milk-line bg-black">
+              Your browser does not support video playback.
+            </video>
+          </div>
+        </div>
         <!-- Inspection Result Form -->
         <div class="pt-3 border-t border-slate-100 space-y-3">
           <div>
-            <label class="block text-xs font-bold text-navy uppercase tracking-wider mb-1.5">
+            <label class="block text-xs font-bold text-slate-900 uppercase tracking-wider mb-1.5">
               Inspector Verification Finding *
             </label>
             <div class="flex items-center gap-6 text-sm">
-              <label class="inline-flex items-center gap-2 cursor-pointer font-semibold text-green-700">
-                <input type="radio" name="revResult" value="Pass" checked class="accent-green-600 w-4 h-4">
+              <label class="inline-flex items-center gap-2 cursor-pointer font-semibold text-emerald-700">
+                <input type="radio" name="revResult" value="Pass" checked class="accent-emerald-600 w-4 h-4">
                 <span>Pass (Conforms to Standards)</span>
               </label>
-              <label class="inline-flex items-center gap-2 cursor-pointer font-semibold text-red-700">
-                <input type="radio" name="revResult" value="Fail" class="accent-red-600 w-4 h-4">
+              <label class="inline-flex items-center gap-2 cursor-pointer font-semibold text-rose-700">
+                <input type="radio" name="revResult" value="Fail" class="accent-rose-600 w-4 h-4">
                 <span>Fail (Non-Compliant)</span>
               </label>
             </div>
           </div>
 
           <div>
-            <label for="revObservations" class="block text-xs font-bold text-navy uppercase tracking-wider mb-1">
+            <label for="revObservations" class="block text-xs font-bold text-slate-900 uppercase tracking-wider mb-1">
               Officer Observations / Inspection Remarks
             </label>
             <textarea id="revObservations" rows="2" placeholder="e.g. Scale inspected and verified within permissible maximum error limits."
-              class="w-full border border-slate-300 rounded-xl px-4 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-gold"></textarea>
+              class="w-full border border-slate-300 rounded-xl px-4 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-plum focus:border-plum bg-white text-slate-900"></textarea>
           </div>
         </div>
 
         <!-- Physical Inspection Scheduling Panel -->
-        <div class="pt-3 border-t-2 border-amber-200 bg-amber-50 rounded-xl p-4 space-y-3">
-          <p class="text-xs font-bold text-amber-800 uppercase tracking-wider flex items-center gap-1.5">
-            🔎 Schedule Physical (On-Site) Inspection
+        <div class="pt-3 border-t-2 border-plum/30 bg-milk-deep rounded-xl p-4 space-y-3">
+          <p class="text-xs font-bold text-plum-dark uppercase tracking-wider flex items-center gap-1.5">
+             Schedule Physical (On-Site) Inspection
           </p>
-          <p class="text-[11px] text-amber-700">Use this when you cannot decide remotely and need to visit the business premises before approving or rejecting.</p>
+          <p class="text-[11px] text-plum-dark/80">Use this when you cannot decide remotely and need to visit the business premises before approving or rejecting.</p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label for="inspectionDateInput" class="block text-[10px] font-bold text-amber-800 uppercase mb-1">Scheduled Visit Date *</label>
-              <input type="date" id="inspectionDateInput" class="w-full border border-amber-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white">
+              <label for="inspectionDateInput" class="block text-[10px] font-bold text-plum-dark uppercase mb-1">Scheduled Visit Date *</label>
+              <input type="date" id="inspectionDateInput" class="w-full border border-plum/40 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-plum bg-white text-slate-900">
             </div>
             <div>
-              <label for="inspectionNotesInput" class="block text-[10px] font-bold text-amber-800 uppercase mb-1">Inspection Notes</label>
-              <input type="text" id="inspectionNotesInput" placeholder="e.g. Verify weighbridge calibration on-site" class="w-full border border-amber-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white">
+              <label for="inspectionNotesInput" class="block text-[10px] font-bold text-plum-dark uppercase mb-1">Inspection Notes</label>
+              <input type="text" id="inspectionNotesInput" placeholder="e.g. Verify weighbridge calibration on-site" class="w-full border border-plum/40 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-plum bg-white text-slate-900">
             </div>
           </div>
           <div class="flex justify-end">
-            <button type="button" id="scheduleInspectBtn" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow flex items-center gap-1.5">
-              📅 Confirm Physical Inspection Schedule
+            <button type="button" id="scheduleInspectBtn" class="btn-brass px-5 py-2.5 rounded-xl text-xs font-bold shadow flex items-center gap-1.5">
+               Confirm Physical Inspection Schedule
             </button>
           </div>
         </div>
 
         <div class="pt-4 border-t border-slate-100 flex flex-wrap justify-end gap-3">
-          <button type="button" data-close-modal class="px-5 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold hover:bg-slate-50">
+          <button type="button" data-close-modal class="btn-secondary px-5 py-2.5 rounded-xl text-xs font-semibold">
             Cancel
           </button>
-          <button type="button" id="rejectActionBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow">
-            ❌ Reject Application
+          <button type="button" id="rejectActionBtn" class="bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow hover:shadow-red-500/25">
+             Reject Application
           </button>
-          <button type="button" id="approveActionBtn" class="bg-navy hover:bg-navy-light text-gold font-bold px-6 py-2.5 rounded-xl text-xs shadow flex items-center gap-1.5">
-            <span>✨ Approve &amp; Generate QR Certificate</span>
+          <button type="button" id="approveActionBtn" class="btn-brass px-6 py-2.5 rounded-xl text-xs font-bold shadow-lg flex items-center gap-1.5">
+            <span> Approve &amp; Generate QR Certificate</span>
           </button>
         </div>
       </div>
@@ -293,19 +335,19 @@
 
   <!-- Complaint Action Modal -->
   <div id="complaintModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto border border-slate-200 my-8">
-      <div class="bg-red-800 text-white font-bold px-6 py-4 flex items-center justify-between sticky top-0 z-10 shadow">
-        <h3 class="text-base font-bold flex items-center gap-2">
-          <span>📢</span> Citizen Grievance Investigation
+    <div class="glass-panel rounded-2xl shadow-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto border border-slate-200/90 my-8 bg-white">
+      <div class="bg-plum text-white font-bold px-6 py-4 flex items-center justify-between sticky top-0 z-10 border-b border-rose-500/30 shadow-lg">
+        <h3 class="text-base font-bold flex items-center gap-2 text-white">
+          <span class="text-rose-400"></span> Citizen Grievance Investigation
         </h3>
-        <button type="button" data-close-modal class="text-white/70 hover:text-white text-2xl font-bold">&times;</button>
+        <button type="button" data-close-modal class="text-slate-400 hover:text-white text-2xl font-bold leading-none">&times;</button>
       </div>
 
       <div class="p-6 space-y-4 text-xs">
         <div class="flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-200">
           <div>
             <span class="text-[10px] font-bold text-slate-400 uppercase">Complaint Ref ID</span>
-            <p id="cmpModalNumber" class="font-mono font-bold text-navy text-sm"></p>
+            <p id="cmpModalNumber" class="font-mono font-bold text-rose-700 text-sm"></p>
           </div>
           <div>
             <span class="text-[10px] font-bold text-slate-400 uppercase">Date Lodged</span>
@@ -314,9 +356,9 @@
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div class="bg-amber-50/60 p-3.5 rounded-xl border border-amber-200">
-            <span class="text-[10px] font-bold text-amber-800 uppercase block mb-1">Accused Seller / Shop Details</span>
-            <p class="font-bold text-navy text-sm" id="cmpModalSeller"></p>
+          <div class="bg-milk-deep p-3.5 rounded-xl border border-milk-line">
+            <span class="text-[10px] font-bold text-plum-dark uppercase block mb-1">Accused Seller / Shop Details</span>
+            <p class="font-bold text-slate-900 text-sm" id="cmpModalSeller"></p>
             <p class="font-semibold text-slate-700" id="cmpModalShop"></p>
             <p class="text-slate-600 mt-1" id="cmpModalAddress"></p>
           </div>
@@ -331,7 +373,7 @@
 
         <div>
           <span class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Reported Violation Type</span>
-          <p id="cmpModalViolation" class="font-bold text-red-700 bg-red-50 p-2 rounded-lg border border-red-200"></p>
+          <p id="cmpModalViolation" class="font-bold text-rose-700 bg-rose-50 p-2 rounded-lg border border-rose-200"></p>
         </div>
 
         <div>
@@ -349,10 +391,10 @@
         <div class="pt-4 border-t border-slate-100 space-y-3">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label for="cmpStatusSelect" class="block text-xs font-bold text-navy uppercase tracking-wider mb-1">
+              <label for="cmpStatusSelect" class="block text-xs font-bold text-slate-900 uppercase tracking-wider mb-1">
                 Investigation Status *
               </label>
-              <select id="cmpStatusSelect" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-gold">
+              <select id="cmpStatusSelect" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-plum focus:border-plum bg-white text-slate-900">
                 <option value="Pending">Pending</option>
                 <option value="Under Review">Under Review</option>
                 <option value="Action Taken">Action Taken / Notice Issued</option>
@@ -361,19 +403,19 @@
               </select>
             </div>
             <div>
-              <label for="cmpOfficerNotes" class="block text-xs font-bold text-navy uppercase tracking-wider mb-1">
+              <label for="cmpOfficerNotes" class="block text-xs font-bold text-slate-900 uppercase tracking-wider mb-1">
                 Officer Notes / Inspection Report
               </label>
               <input type="text" id="cmpOfficerNotes" placeholder="e.g. Field inspection conducted; notice issued under Sec 30."
-                class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-gold">
+                class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-plum focus:border-plum bg-white text-slate-900">
             </div>
           </div>
 
           <div class="flex justify-end gap-3 pt-2">
-            <button type="button" data-close-modal class="px-5 py-2 rounded-xl border border-slate-300 text-xs font-semibold">
+            <button type="button" data-close-modal class="btn-secondary px-5 py-2 rounded-xl text-xs font-semibold">
               Close
             </button>
-            <button type="button" id="saveComplaintBtn" class="bg-navy hover:bg-navy-light text-gold font-bold px-6 py-2 rounded-xl text-xs shadow">
+            <button type="button" id="saveComplaintBtn" class="btn-primary px-6 py-2 rounded-xl text-xs font-bold shadow">
               Update Complaint Record
             </button>
           </div>
@@ -384,7 +426,7 @@
 
   <div id="footer-container"></div>
 
-  <script src="js/script.js"></script>
+  <script src="script.js"></script>
   <script>
     const user = requireAuth('Officer');
     if (!user) throw new Error('Unauthorized');
@@ -395,6 +437,10 @@
     initModalClose('complaintModal');
 
     document.getElementById('officerName').textContent = user.name;
+    const badgeEl = document.getElementById('officerIdBadge');
+    if (badgeEl && user.officerId) {
+      badgeEl.textContent = user.officerId;
+    }
 
     let pendingList = [];
     let verifiedList = [];
@@ -414,9 +460,9 @@
 
     function setActiveTab(btn, section) {
       document.querySelectorAll('.tab-btn').forEach((b) => {
-        b.className = 'tab-btn flex-1 py-3.5 text-center text-slate-500 hover:text-navy border-b-2 border-transparent transition-all flex items-center justify-center gap-2';
+        b.className = 'tab-btn flex-1 py-3.5 text-center text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition-all flex items-center justify-center gap-2';
       });
-      btn.className = 'tab-btn flex-1 py-3.5 text-center text-navy border-b-2 border-gold bg-white transition-all flex items-center justify-center gap-2';
+      btn.className = 'tab-btn flex-1 py-3.5 text-center text-slate-900 border-b-2 border-plum bg-white font-bold transition-all flex items-center justify-center gap-2';
 
       tabPendingSection.classList.add('hidden');
       tabInspectionsSection.classList.add('hidden');
@@ -465,7 +511,7 @@
       const container = document.getElementById('pendingListContainer');
       container.innerHTML = `
         <div class="text-center py-10 text-slate-400 text-sm">
-          <span class="animate-spin inline-block text-xl mb-1">⏳</span>
+          <span class="animate-spin inline-block text-xl mb-1"></span>
           <p>Loading pending verification requests...</p>
         </div>
       `;
@@ -479,7 +525,7 @@
           container.innerHTML = `
             <div class="text-center py-12">
               <div class="text-4xl mb-2">🎉</div>
-              <h4 class="font-bold text-navy text-sm">No Pending Applications</h4>
+              <h4 class="font-bold text-slate-900 text-sm">No Pending Applications</h4>
               <p class="text-xs text-slate-400 mt-1">All commercial instruments have been processed.</p>
             </div>
           `;
@@ -493,7 +539,7 @@
                 class="w-16 h-16 rounded-xl object-cover border border-slate-200 shadow-sm flex-shrink-0">
               <div>
                 <div class="flex items-center gap-2">
-                  <h4 class="font-bold text-navy text-sm">${escapeHtml(app.instrumentName)}</h4>
+                  <h4 class="font-bold text-slate-900 text-sm">${escapeHtml(app.instrumentName)}</h4>
                   <span class="text-xs font-semibold px-2 py-0.5 rounded-full status-pill-pending">Awaiting Inspection</span>
                 </div>
                 <p class="text-xs text-slate-500 mt-0.5">
@@ -507,9 +553,9 @@
               </div>
             </div>
 
-            <button type="button" class="inspect-btn bg-navy hover:bg-navy-light text-gold font-bold px-4 py-2 rounded-xl text-xs transition-colors shadow flex items-center gap-1.5"
+            <button type="button" class="inspect-btn btn-primary px-4 py-2 rounded-xl text-xs shadow flex items-center gap-1.5"
               data-id="${app.id}">
-              <span>🔍 Inspect &amp; Approve</span>
+              <span> Inspect &amp; Approve</span>
             </button>
           </div>
         `).join('');
@@ -529,14 +575,36 @@
       if (!app) return;
 
       currentAppId = appId;
-      document.getElementById('revOwnerName').textContent = app.ownerName;
-      document.getElementById('revShopName').textContent = app.shopName;
-      document.getElementById('revShopAddress').textContent = app.shopAddress;
-      document.getElementById('revPhone').textContent = app.phone;
+      document.getElementById('revOwnerName').textContent = app.ownerName || 'Machine Holder';
+      const aadhEl = document.getElementById('revAadhaarText');
+      if (aadhEl) {
+        aadhEl.textContent = app.aadhaarNo || '5432 1098 7654';
+      }
+      document.getElementById('revShopName').textContent = app.shopName || 'Commercial Store';
+      document.getElementById('revShopAddress').textContent = app.shopAddress || 'Business Location';
+      document.getElementById('revPhone').textContent = app.phone || '+91 98230 11223';
       document.getElementById('revInstName').textContent = app.instrumentName;
       document.getElementById('revCategory').textContent = app.category;
       document.getElementById('revSerialCapacity').textContent = `${app.serialNumber || 'N/A'} • ${app.capacity || 'Standard'}`;
-      document.getElementById('revPhoto').src = fileUrl(app.photo);
+      
+      const photoSrc = fileUrl(app.photo);
+      document.getElementById('revPhoto').src = photoSrc;
+      const photoLink = document.getElementById('revPhotoLink');
+      if (photoLink) photoLink.href = photoSrc;
+
+
+      // Show video proof if available
+      const revVideo = document.getElementById('revVideo');
+      const revVideoContainer = document.getElementById('revVideoContainer');
+      if (revVideoContainer && revVideo) {
+        if (app.video) {
+          revVideo.src = fileUrl(app.video);
+          revVideoContainer.classList.remove('hidden');
+        } else {
+          revVideo.src = '';
+          revVideoContainer.classList.add('hidden');
+        }
+      }
       document.getElementById('revObservations').value = app.observations || 'Physically inspected conforming to Legal Metrology Standards.';
       document.querySelector('input[name="revResult"][value="Pass"]').checked = true;
       // Reset inspection scheduling fields
@@ -558,7 +626,7 @@
       const observations = document.getElementById('revObservations').value.trim();
       const btn = document.getElementById('approveActionBtn');
       btn.disabled = true;
-      btn.innerHTML = '<span>⏳ Issuing Certificate &amp; QR...</span>';
+      btn.innerHTML = '<span> Issuing Certificate &amp; QR...</span>';
 
       try {
         const res = await api(`/api/applications/${currentAppId}/approve`, {
@@ -578,7 +646,7 @@
         showToast(err.message || 'Approval failed', 'error');
       } finally {
         btn.disabled = false;
-        btn.innerHTML = '<span>✨ Approve &amp; Generate QR Certificate</span>';
+        btn.innerHTML = '<span> Approve &amp; Generate QR Certificate</span>';
       }
     });
 
@@ -626,7 +694,7 @@
 
       const btn = document.getElementById('scheduleInspectBtn');
       btn.disabled = true;
-      btn.textContent = '⏳ Scheduling...';
+      btn.textContent = ' Scheduling...';
 
       try {
         const res = await api(`/api/applications/${currentAppId}/inspect`, {
@@ -648,7 +716,7 @@
         showToast(err.message || 'Could not schedule inspection', 'error');
       } finally {
         btn.disabled = false;
-        btn.innerHTML = '📅 Confirm Physical Inspection Schedule';
+        btn.innerHTML = ' Confirm Physical Inspection Schedule';
       }
     });
 
@@ -672,8 +740,8 @@
         if (inspections.length === 0) {
           container.innerHTML = `
             <div class="text-center py-12">
-              <div class="text-4xl mb-2">✅</div>
-              <h4 class="font-bold text-navy text-sm">No Pending Physical Inspections</h4>
+              <div class="text-4xl mb-2"></div>
+              <h4 class="font-bold text-slate-900 text-sm">No Pending Physical Inspections</h4>
               <p class="text-xs text-slate-400 mt-1">All scheduled site visits have been processed.</p>
             </div>
           `;
@@ -681,31 +749,31 @@
         }
 
         container.innerHTML = inspections.map((app) => `
-          <div class="py-4 px-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 hover:bg-amber-50 transition-colors rounded-xl border-l-4 border-amber-400 mb-2">
+          <div class="py-4 px-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 hover:bg-milk-deep transition-colors rounded-xl border-l-4 border-plum mb-2">
             <div class="flex items-start gap-4">
               <img src="${fileUrl(app.photo)}" alt="${escapeHtml(app.instrumentName)}"
                 class="w-16 h-16 rounded-xl object-cover border border-slate-200 shadow-sm flex-shrink-0">
               <div>
                 <div class="flex items-center gap-2 flex-wrap">
-                  <h4 class="font-bold text-navy text-sm">${escapeHtml(app.instrumentName)}</h4>
-                  <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">🔎 Physical Inspection</span>
+                  <h4 class="font-bold text-slate-900 text-sm">${escapeHtml(app.instrumentName)}</h4>
+                  <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-white/15 text-plum-dark border border-plum/30"> Physical Inspection</span>
                 </div>
                 <p class="text-xs text-slate-500 mt-0.5">
                   Owner: <strong>${escapeHtml(app.ownerName)}</strong> &bull; <strong>${escapeHtml(app.shopName)}</strong>
                 </p>
                 <p class="text-xs text-slate-400 mt-0.5">${escapeHtml(app.shopAddress)}</p>
                 <div class="mt-1 flex flex-wrap gap-3 text-[11px]">
-                  <span class="bg-amber-50 border border-amber-200 text-amber-800 px-2 py-0.5 rounded-lg">
-                    📅 Visit: <strong>${app.inspectionDate ? new Date(app.inspectionDate).toLocaleDateString() : 'TBD'}</strong>
+                  <span class="bg-white/15 border border-plum/30 text-plum-dark px-2 py-0.5 rounded-lg">
+                     Visit: <strong>${app.inspectionDate ? new Date(app.inspectionDate).toLocaleDateString() : 'TBD'}</strong>
                   </span>
-                  ${app.inspectionNotes ? `<span class="text-slate-500">📝 ${escapeHtml(app.inspectionNotes)}</span>` : ''}
+                  ${app.inspectionNotes ? `<span class="text-slate-500"> ${escapeHtml(app.inspectionNotes)}</span>` : ''}
                 </div>
               </div>
             </div>
             <div class="flex gap-2 flex-shrink-0">
-              <button type="button" class="inspect-btn bg-navy hover:bg-navy-light text-gold font-bold px-4 py-2 rounded-xl text-xs shadow"
+              <button type="button" class="inspect-btn btn-brass px-4 py-2 rounded-xl text-xs font-bold shadow"
                 data-id="${app.id}">
-                ✅ Complete Review
+                 Complete Review
               </button>
             </div>
           </div>
@@ -756,22 +824,22 @@
           <div class="py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 ${renewalStatus.borderClass} pl-4 pr-2 hover:bg-slate-50 transition-colors rounded-r-xl">
             <div>
               <div class="flex items-center gap-2">
-                <h4 class="font-bold text-navy text-sm">${escapeHtml(app.instrumentName)}</h4>
+                <h4 class="font-bold text-slate-900 text-sm">${escapeHtml(app.instrumentName)}</h4>
                 <span class="text-xs font-bold px-2.5 py-0.5 rounded-full ${renewalStatus.badgeClass}">${renewalStatus.label}</span>
               </div>
               <p class="text-xs text-slate-600 mt-0.5">
                 Owner: <strong>${escapeHtml(app.ownerName)}</strong> &bull; Shop: <strong>${escapeHtml(app.shopName)}</strong> &bull; ${escapeHtml(app.shopAddress)}
               </p>
               <div class="text-xs mt-1 space-x-3 text-slate-500">
-                <span class="font-mono text-navy font-semibold">Cert: ${escapeHtml(app.certificateId)}</span>
+                <span class="font-mono text-plum-dark bg-milk-deep px-2 py-0.5 rounded border border-plum/20 font-bold">Cert: ${escapeHtml(app.certificateId)}</span>
                 <span>Verified: ${formatDate(app.verificationDate)}</span>
-                <span class="font-semibold ${renewalStatus.level === 'red' ? 'text-red-600' : 'text-slate-700'}">Expiry: ${formatDate(app.expiryDate)}</span>
+                <span class="font-semibold ${renewalStatus.level === 'red' ? 'text-rose-600 font-bold' : 'text-slate-700'}">Expiry: ${formatDate(app.expiryDate)}</span>
               </div>
             </div>
 
             <a href="verify.html?code=${encodeURIComponent(app.certificateId)}" target="_blank"
-              class="text-xs bg-slate-100 hover:bg-slate-200 text-navy font-bold px-3 py-1.5 rounded-lg border border-slate-200 flex items-center gap-1">
-              <span>🔍 Public QR Link &rarr;</span>
+              class="btn-secondary text-xs px-3.5 py-1.5 rounded-xl font-bold flex items-center gap-1 shadow-sm">
+              <span> Public QR Link &rarr;</span>
             </a>
           </div>
         `;
@@ -781,9 +849,9 @@
     document.querySelectorAll('.verified-filter').forEach((btn) => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.verified-filter').forEach((b) => {
-          b.className = 'verified-filter bg-slate-100 text-slate-700 px-3 py-1 rounded-lg';
+          b.className = 'verified-filter bg-slate-100 text-slate-700 hover:text-slate-900 px-3 py-1 rounded-lg text-xs font-semibold';
         });
-        btn.className = 'verified-filter active bg-navy text-white px-3 py-1 rounded-lg';
+        btn.className = 'verified-filter active btn-primary px-3 py-1 rounded-lg text-xs font-bold shadow';
         currentVFilter = btn.dataset.vfilter;
         renderVerifiedList();
       });
@@ -805,8 +873,8 @@
         if (complaintsList.length === 0) {
           container.innerHTML = `
             <div class="text-center py-12">
-              <div class="text-4xl mb-2">🛡️</div>
-              <h4 class="font-bold text-navy text-sm">No Complaints Filed</h4>
+              <div class="text-4xl mb-2"></div>
+              <h4 class="font-bold text-slate-900 text-sm">No Complaints Filed</h4>
               <p class="text-xs text-slate-400 mt-1">No citizen reports recorded matching this status.</p>
             </div>
           `;
@@ -815,33 +883,33 @@
 
         container.innerHTML = complaintsList.map((c) => {
           const badgeColors = {
-            Pending: 'bg-red-100 text-red-800 border-red-300',
+            Pending: 'bg-rose-100 text-rose-800 border-rose-300',
             'Under Review': 'bg-amber-100 text-amber-800 border-amber-300',
-            'Action Taken': 'bg-blue-100 text-blue-800 border-blue-300',
-            Resolved: 'bg-green-100 text-green-800 border-green-300',
+            'Action Taken': 'bg-sky-100 text-sky-800 border-sky-300',
+            Resolved: 'bg-emerald-100 text-emerald-800 border-emerald-300',
             Dismissed: 'bg-slate-100 text-slate-700 border-slate-300',
           };
 
           return `
-            <div class="py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-l-4 border-red-500 pl-4 pr-2 hover:bg-slate-50 transition-colors rounded-r-xl">
+            <div class="py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-l-4 border-rose-500 pl-4 pr-2 hover:bg-slate-50 transition-colors rounded-r-xl">
               <div>
                 <div class="flex items-center gap-2">
-                  <span class="font-mono font-bold text-xs text-red-700">${escapeHtml(c.complaintNumber || 'CMP')}</span>
+                  <span class="font-mono font-bold text-xs text-rose-700">${escapeHtml(c.complaintNumber || 'CMP')}</span>
                   <span class="text-xs font-bold px-2 py-0.5 rounded-full border ${badgeColors[c.status] || ''}">${c.status}</span>
                   <span class="text-xs text-slate-400">&bull; ${formatDate(c.createdAt)}</span>
                 </div>
-                <h4 class="font-bold text-navy text-sm mt-1">
+                <h4 class="font-bold text-slate-900 text-sm mt-1">
                   Accused: ${escapeHtml(c.sellerName)} ${c.shopName ? `(${escapeHtml(c.shopName)})` : ''}
                 </h4>
                 <p class="text-xs text-slate-600">Location: ${escapeHtml(c.shopAddress)}</p>
-                <p class="text-xs text-red-700 font-semibold mt-1">Violation: ${escapeHtml(c.violationType || 'Unspecified')}</p>
+                <p class="text-xs text-rose-700 font-semibold mt-1">Violation: ${escapeHtml(c.violationType || 'Unspecified')}</p>
                 <p class="text-xs text-slate-500 italic mt-0.5 line-clamp-1">"${escapeHtml(c.description)}"</p>
               </div>
 
               <div class="flex items-center gap-2">
-                <button type="button" class="view-cmp-btn bg-red-700 hover:bg-red-800 text-white font-bold px-4 py-2 rounded-xl text-xs transition-colors shadow flex items-center gap-1.5"
+                <button type="button" class="view-cmp-btn bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-bold px-4 py-2 rounded-xl text-xs transition-all shadow hover:shadow-red-500/25 flex items-center gap-1.5"
                   data-id="${c.id}">
-                  <span>🚨 Inspect Grievance</span>
+                  <span> Inspect Grievance</span>
                 </button>
               </div>
             </div>
@@ -873,7 +941,7 @@
       document.getElementById('cmpModalAddress').textContent = cmp.shopAddress;
       document.getElementById('cmpModalComplainant').textContent = cmp.complainantName;
       document.getElementById('cmpModalPhone').textContent = `📞 ${cmp.complainantPhone}`;
-      document.getElementById('cmpModalEmail').textContent = cmp.complainantEmail ? `✉️ ${cmp.complainantEmail}` : '';
+      document.getElementById('cmpModalEmail').textContent = cmp.complainantEmail ? cmp.complainantEmail : '';
       document.getElementById('cmpModalViolation').textContent = cmp.violationType || 'Expired Machine / No Renewal';
       document.getElementById('cmpModalDesc').textContent = cmp.description;
       document.getElementById('cmpStatusSelect').value = cmp.status;

@@ -9,18 +9,41 @@ const STORAGE_KEYS = {
   USERS_DB: 'lmvs_db_users',
   APPS_DB: 'lmvs_db_applications',
   COMPLAINTS_DB: 'lmvs_db_complaints',
+  THEME: 'lmvs_theme',
 };
+
+// Auto-run theme initialization immediately
+function initTheme() {
+  const saved = localStorage.getItem(STORAGE_KEYS.THEME) || 'light';
+  if (saved === 'dark') {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
+}
+initTheme();
+
+function toggleTheme() {
+  const isDark = document.documentElement.classList.toggle('dark');
+  localStorage.setItem(STORAGE_KEYS.THEME, isDark ? 'dark' : 'light');
+  document.querySelectorAll('.theme-toggle-btn').forEach(btn => {
+    btn.innerHTML = isDark ? ' Light' : ' Dark';
+  });
+  showToast(isDark ? ' Midnight theme activated' : ' Executive light theme activated', 'info');
+}
 
 // ----------------------------------------------------
 // 1. INITIAL SEED DATA (Local in-browser Database)
 // ----------------------------------------------------
 function initLocalStorageDatabase() {
   // Seed Users
-  if (!localStorage.getItem(STORAGE_KEYS.USERS_DB)) {
-    const initialUsers = [
+  let users = JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS_DB) || 'null');
+  if (!users || !Array.isArray(users) || users.length === 0) {
+    users = [
       {
         id: 'usr_officer_01',
         name: 'Legal Metrology Officer',
+        officerId: '113iom20',
         email: 'officer@lmvs.gov',
         password: 'Officer@123',
         role: 'Officer',
@@ -31,6 +54,7 @@ function initLocalStorageDatabase() {
       {
         id: 'usr_owner_01',
         name: 'Rajesh Sharma',
+        aadhaarNo: '5432 1098 7654',
         email: 'owner@example.com',
         password: 'Owner@123',
         role: 'Owner',
@@ -39,7 +63,20 @@ function initLocalStorageDatabase() {
         phone: '+91 98230 11223',
       },
     ];
-    localStorage.setItem(STORAGE_KEYS.USERS_DB, JSON.stringify(initialUsers));
+    localStorage.setItem(STORAGE_KEYS.USERS_DB, JSON.stringify(users));
+  } else {
+    // Ensure demo owner has Aadhaar number
+    let modified = false;
+    users = users.map((u) => {
+      if (u.role === 'Owner' && !u.aadhaarNo) {
+        u.aadhaarNo = '5432 1098 7654';
+        modified = true;
+      }
+      return u;
+    });
+    if (modified) {
+      localStorage.setItem(STORAGE_KEYS.USERS_DB, JSON.stringify(users));
+    }
   }
 
   // Seed Sample Applications / Instruments
@@ -72,6 +109,7 @@ function initLocalStorageDatabase() {
         id: 'app_001',
         owner: 'usr_owner_01',
         ownerName: 'Rajesh Sharma',
+        aadhaarNo: '5432 1098 7654',
         shopName: 'Rajesh Supermarket & Provision Mart',
         shopAddress: 'Shop #18, Main Commercial Complex, Market Yard',
         phone: '+91 98230 11223',
@@ -92,6 +130,7 @@ function initLocalStorageDatabase() {
         id: 'app_002',
         owner: 'usr_owner_01',
         ownerName: 'Rajesh Sharma',
+        aadhaarNo: '5432 1098 7654',
         shopName: 'Rajesh Supermarket & Provision Mart',
         shopAddress: 'Shop #18, Main Commercial Complex, Market Yard',
         phone: '+91 98230 11223',
@@ -112,6 +151,7 @@ function initLocalStorageDatabase() {
         id: 'app_003',
         owner: 'usr_owner_01',
         ownerName: 'Rajesh Sharma',
+        aadhaarNo: '5432 1098 7654',
         shopName: 'Rajesh Supermarket & Provision Mart',
         shopAddress: 'Shop #18, Main Commercial Complex, Market Yard',
         phone: '+91 98230 11223',
@@ -132,6 +172,7 @@ function initLocalStorageDatabase() {
         id: 'app_004',
         owner: 'usr_owner_01',
         ownerName: 'Rajesh Sharma',
+        aadhaarNo: '5432 1098 7654',
         shopName: 'Rajesh Supermarket & Provision Mart',
         shopAddress: 'Shop #18, Main Commercial Complex, Market Yard',
         phone: '+91 98230 11223',
@@ -145,6 +186,20 @@ function initLocalStorageDatabase() {
       },
     ];
     localStorage.setItem(STORAGE_KEYS.APPS_DB, JSON.stringify(initialApps));
+  } else {
+    // Ensure all stored applications have an aadhaarNo for officer verification
+    let apps = JSON.parse(localStorage.getItem(STORAGE_KEYS.APPS_DB) || '[]');
+    let modified = false;
+    apps = apps.map((a) => {
+      if (!a.aadhaarNo) {
+        a.aadhaarNo = '5432 1098 7654';
+        modified = true;
+      }
+      return a;
+    });
+    if (modified) {
+      localStorage.setItem(STORAGE_KEYS.APPS_DB, JSON.stringify(apps));
+    }
   }
 
   // Seed Sample Complaints
@@ -251,13 +306,65 @@ function readFileAsDataUrl(file) {
 }
 
 // ----------------------------------------------------
-// 4. STANDALONE CLIENT-SIDE API INTERCEPTOR
+// 4. API CLIENT (Node.js Backend & MongoDB Atlas)
 // ----------------------------------------------------
-async function api(path, options = {}) {
-  // Realistic brief response delay
-  await new Promise((r) => setTimeout(r, 60));
+const BACKEND_BASE_URL = (typeof window !== 'undefined' && window.location.origin && window.location.origin.includes(':5000'))
+  ? ''
+  : 'http://localhost:5000';
 
+async function api(path, options = {}) {
   const method = (options.method || 'GET').toUpperCase();
+  const token = getToken();
+
+  // 1. First, attempt real Node.js Backend Server (Connected to MongoDB Atlas)
+  try {
+    const fetchHeaders = {};
+    if (token) {
+      fetchHeaders['Authorization'] = `Bearer ${token}`;
+    }
+
+    let fetchBody = options.body;
+    if (fetchBody && !(fetchBody instanceof FormData) && typeof fetchBody === 'object') {
+      fetchHeaders['Content-Type'] = 'application/json';
+      fetchBody = JSON.stringify(fetchBody);
+    } else if (typeof fetchBody === 'string' && !options.headers?.['Content-Type']) {
+      fetchHeaders['Content-Type'] = 'application/json';
+    }
+
+    if (options.headers) {
+      Object.assign(fetchHeaders, options.headers);
+    }
+
+    const fullUrl = `${BACKEND_BASE_URL}${path}`;
+    const res = await fetch(fullUrl, {
+      method,
+      headers: fetchHeaders,
+      body: ['GET', 'HEAD'].includes(method) ? undefined : fetchBody,
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data.message || `Request failed with status ${res.status}`);
+    }
+
+    return data;
+  } catch (netErr) {
+    // If backend returned a functional error message (e.g. 400 Bad Request, 401 Unauthorized), rethrow immediately!
+    const isNetworkFailure =
+      netErr.message.includes('Failed to fetch') ||
+      netErr.message.includes('NetworkError') ||
+      netErr.message.includes('fetch failed') ||
+      netErr.name === 'TypeError';
+
+    if (!isNetworkFailure) {
+      throw netErr;
+    }
+
+    console.warn(`[LMVS] Node.js server unreachable at ${BACKEND_BASE_URL}. Running local client fallback.`, netErr.message);
+  }
+
+  // 2. Local Fallback runtime (runs when offline or opened via file://)
+  await new Promise((r) => setTimeout(r, 60));
   const user = getCurrentUser();
 
   // Extract Request Body
@@ -276,34 +383,99 @@ async function api(path, options = {}) {
     body = options.body;
   }
 
-  // 1. Auth: Login
+  // 1. Auth: Dedicated Officer Register
+  if (path === '/api/auth/officer-register' && method === 'POST') {
+    const users = getLocalUsers();
+    const rawId = (body.idno || body.officerId || '').trim();
+    if (!rawId.toLowerCase().startsWith('113iom')) {
+      throw new Error("Invalid Officer ID: Officer ID must start with authorized prefix '113iom' (e.g. 113iom20, 113iom21).");
+    }
+    const name = (body.name || '').trim();
+    if (!name) throw new Error('Officer Name is required.');
+
+    let existing = users.find((u) => u.officerId && u.officerId.toLowerCase() === rawId.toLowerCase());
+    if (existing) {
+      throw new Error(`Officer ID "${rawId}" is already registered. Please proceed to login.`);
+    }
+
+    const newOfficer = {
+      id: 'usr_' + Date.now(),
+      name,
+      officerId: rawId.toLowerCase(),
+      email: body.email || `${rawId.toLowerCase()}@lmvs.gov`,
+      phone: body.phone || '011-2338-0000',
+      role: 'Officer',
+      shopName: 'Legal Metrology Enforcement Division',
+      shopAddress: 'District Administrative Complex, Room 104',
+      password: body.password || 'Officer@123',
+      createdAt: new Date().toISOString(),
+    };
+    users.push(newOfficer);
+    saveLocalUsers(users);
+
+    const { password, ...safeOfficer } = newOfficer;
+    const token = 'client_token_' + btoa(JSON.stringify(safeOfficer));
+    return { token, user: safeOfficer, message: 'Officer registered successfully!' };
+  }
+
+  // 2. Auth: Login
   if (path === '/api/auth/login' && method === 'POST') {
     const users = getLocalUsers();
-    const found = users.find(
-      (u) => u.email.toLowerCase() === (body.email || '').trim().toLowerCase() && u.password === body.password
-    );
+    const rawId = (body.identifier || body.email || body.officerId || body.aadhaarNo || body.phone || '').trim();
+    const cleanDigits = rawId.replace(/\D/g, '');
+    const enteredPass = body.password || '';
+
+    const found = users.find((u) => {
+      if (u.password !== enteredPass) return false;
+      if (u.email && u.email.toLowerCase() === rawId.toLowerCase()) return true;
+      if (u.officerId && u.officerId.toLowerCase() === rawId.toLowerCase()) return true;
+      if (cleanDigits.length >= 10) {
+        const uPhoneDigits = (u.phone || '').replace(/\D/g, '');
+        const uAadhaarDigits = (u.aadhaarNo || '').replace(/\D/g, '');
+        if (cleanDigits === uPhoneDigits || cleanDigits === uAadhaarDigits) return true;
+      }
+      return false;
+    });
+
     if (!found) {
-      throw new Error('Invalid email or password');
+      throw new Error('Invalid credentials. Check your Aadhaar / Mobile / Officer ID / Email and Password.');
     }
     const { password, ...safeUser } = found;
     const token = 'client_token_' + btoa(JSON.stringify(safeUser));
     return { token, user: safeUser };
   }
 
-  // 2. Auth: Register
+  // 3. Auth: Register (Machine Holder / Trader)
   if (path === '/api/auth/register' && method === 'POST') {
     const users = getLocalUsers();
-    const exists = users.find((u) => u.email.toLowerCase() === (body.email || '').trim().toLowerCase());
-    if (exists) {
-      throw new Error('An account with this email address already exists');
+    if (body.role === 'Officer' || body.officerId) {
+      const rawId = (body.officerId || '').trim();
+      if (!rawId.toLowerCase().startsWith('113iom')) {
+        throw new Error("Invalid Officer ID: Officer ID must start with authorized prefix '113iom' (e.g. 113iom20, 113iom21).");
+      }
     }
+
+    const email = (body.email || (body.phone ? body.phone.replace(/\D/g, '') + '@lmvs.shop' : '')).trim().toLowerCase();
+    const aadhaarClean = (body.aadhaarNo || '').replace(/\D/g, '');
+
+    const exists = users.find((u) => {
+      if (email && u.email && u.email.toLowerCase() === email) return true;
+      if (aadhaarClean && u.aadhaarNo && u.aadhaarNo.replace(/\D/g, '') === aadhaarClean) return true;
+      return false;
+    });
+
+    if (exists) {
+      throw new Error('An account with this Aadhaar Number or Email is already registered.');
+    }
+
     const newUser = {
       id: 'usr_' + Date.now(),
-      name: body.name,
-      email: body.email.trim(),
-      phone: body.phone,
-      shopName: body.shopName,
-      shopAddress: body.shopAddress,
+      name: body.name || 'Shopkeeper',
+      aadhaarNo: body.aadhaarNo || '',
+      phone: body.phone || '',
+      email: email,
+      shopName: body.shopName || '',
+      shopAddress: body.shopAddress || '',
       password: body.password,
       role: 'Owner',
     };
@@ -386,10 +558,19 @@ async function api(path, options = {}) {
       photoData = body.photo;
     }
 
+    let videoData = '';
+    if (body.video instanceof Blob) {
+      const read = await readFileAsDataUrl(body.video);
+      if (read) videoData = read;
+    } else if (typeof body.video === 'string' && body.video.length > 0) {
+      videoData = body.video;
+    }
+
     const newApp = {
       id: 'app_' + Date.now(),
       owner: user.id,
       ownerName: user.name,
+      aadhaarNo: body.aadhaarNo || user.aadhaarNo || '',
       shopName: body.shopName || user.shopName,
       shopAddress: body.shopAddress || user.shopAddress,
       phone: body.phone || user.phone,
@@ -398,6 +579,7 @@ async function api(path, options = {}) {
       serialNumber: body.serialNumber || '',
       capacity: body.capacity || '',
       photo: photoData,
+      video: videoData,
       status: 'Pending',
       createdAt: new Date().toISOString(),
     };
@@ -596,7 +778,10 @@ async function api(path, options = {}) {
 // ----------------------------------------------------
 function fileUrl(path) {
   if (!path) return 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=300&auto=format&fit=crop&q=80';
-  return path;
+  if (path.startsWith('data:') || path.startsWith('http://') || path.startsWith('https://')) return path;
+  const base = (typeof BACKEND_BASE_URL !== 'undefined' && BACKEND_BASE_URL) ? BACKEND_BASE_URL.replace(/\/+$/, '') : '';
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  return `${base}${cleanPath}`;
 }
 
 function formatDate(value) {
@@ -631,7 +816,7 @@ function getRenewalStatus(expiryDate) {
     const overdue = Math.abs(daysLeft);
     return {
       level: 'red',
-      label: `🔴 Expired (${overdue}d overdue)`,
+      label: ` Expired (${overdue}d overdue)`,
       color: 'red',
       badgeClass: 'status-pill-red',
       borderClass: 'indicator-border-red',
@@ -643,7 +828,7 @@ function getRenewalStatus(expiryDate) {
   if (daysLeft <= 30) {
     return {
       level: 'yellow',
-      label: `🟡 Renewal Due Soon (${daysLeft}d left)`,
+      label: ` Renewal Due Soon (${daysLeft}d left)`,
       color: 'yellow',
       badgeClass: 'status-pill-yellow',
       borderClass: 'indicator-border-yellow',
@@ -654,7 +839,7 @@ function getRenewalStatus(expiryDate) {
 
   return {
     level: 'green',
-    label: `🟢 Valid (${daysLeft}d left)`,
+    label: ` Valid (${daysLeft}d left)`,
     color: 'green',
     badgeClass: 'status-pill-green',
     borderClass: 'indicator-border-green',
@@ -723,60 +908,110 @@ function showToast(message, type = 'info') {
   }, 4500);
 }
 
+function directOfficerAccess() {
+  const user = getCurrentUser();
+  if (user && user.role === 'Officer') {
+    window.location.href = 'officer-dashboard.html';
+  } else {
+    window.location.href = 'login.html?role=officer';
+  }
+}
+
 function renderNavbar(options = {}) {
   const { activePage = '' } = options;
   const user = getCurrentUser();
+  const isDark = document.documentElement.classList.contains('dark');
 
   const navClass = (name) =>
     activePage === name
-      ? 'text-gold font-bold border-b-2 border-gold pb-0.5'
-      : 'text-white/85 hover:text-gold transition-colors font-medium';
+      ? 'text-white font-bold border-b-2 border-white pb-0.5'
+      : 'text-white/85 hover:text-white transition-colors font-semibold';
+
+  const officerUrl = user && user.role === 'Officer' ? 'officer-dashboard.html' : 'login.html?role=officer';
 
   let links = `
     <a href="index.html" class="${navClass('home')}">Home</a>
-    <a href="verify.html" class="${navClass('verify')}">Scan & Verify</a>
-    <a href="complaint.html" class="${navClass('complaint')}">File Complaint</a>
-    <a href="chatbot.html" class="${navClass('chatbot')}">🤖 AI Assistant</a>
+    <a href="${officerUrl}" class="${navClass('officer')} direct-officer-link flex items-center gap-1">
+      <span>Officer</span>
+    </a>
+    <a href="${user && user.role === 'Owner' ? 'owner-dashboard.html' : 'login.html'}" class="${navClass('owner')}">Machine Holder</a>
+    <a href="complaint.html" class="${navClass('complaint')}">File a Complaint</a>
+    <a href="chatbot.html" class="${navClass('chatbot')} flex items-center gap-1 text-milk-subtle hover:text-white">
+      <span>Help</span>
+    </a>
   `;
 
+  let authSection = '';
   if (user) {
-    if (user.role === 'Owner') {
-      links += `<a href="owner-dashboard.html" class="${navClass('owner')}">Seller Dashboard</a>`;
-    } else if (user.role === 'Officer') {
-      links += `<a href="officer-dashboard.html" class="${navClass('officer')}">Officer Dashboard</a>`;
-    }
-    links += `
-      <div class="flex items-center gap-2 border-l border-white/20 pl-4 ml-2">
-        <span class="text-xs bg-gold/20 text-gold border border-gold/40 px-2.5 py-1 rounded-full font-semibold">
-          ${user.role === 'Officer' ? '👮 Officer' : '🏭 ' + escapeHtml(user.name.split(' ')[0])}
+    authSection = `
+      <div class="flex items-center gap-2 border-l border-white/20 pl-3">
+        <span class="text-xs bg-white/15 text-white border border-white/25 px-2.5 py-1 rounded-full font-medium">
+          ${user.role === 'Officer' ? `⚖ Officer (${user.officerId || '113iom20'})` : escapeHtml(user.name.split(' ')[0])}
         </span>
-        <a href="#" id="logoutBtn" class="text-xs text-white/70 hover:text-red-300 font-semibold transition-colors">Logout</a>
+        <a href="#" id="logoutBtn" class="text-xs text-white/80 hover:text-white font-semibold transition-colors">Logout</a>
       </div>
     `;
   } else {
-    links += `
-      <a href="login.html" class="bg-gold hover:bg-gold-light text-navy font-bold px-4 py-1.5 rounded-lg text-xs transition-colors shadow">
-        Sign In / Register
+    authSection = `
+      <a href="login.html" class="bg-white/15 hover:bg-white/25 text-white py-1 px-3 text-xs font-semibold rounded-md border border-white/25 transition-colors">
+        Sign In
       </a>
     `;
   }
 
+  // Officer Button on top navbar (guarded)
+  const topOfficerBtn = `
+    <a href="${officerUrl}" class="direct-officer-btn bg-milk text-plum hover:bg-milk-deep px-3 py-1.5 rounded-lg text-xs font-bold shadow-md transition-all flex items-center gap-1.5 border border-milk/40 hover:scale-105">
+      <span>⚖ ${user && user.role === 'Officer' ? 'Officer Dashboard' : 'Officer Access'}</span>
+    </a>
+  `;
+
+  // Theme toggle button
+  const themeBtn = `
+    <button type="button" class="theme-toggle-btn text-xs bg-white/10 hover:bg-white/20 text-white border border-white/20 px-2 py-1.5 rounded-md cursor-pointer ml-1" title="Toggle Dark/Light Mode">
+      ${isDark ? 'Light' : 'Dark'}
+    </button>
+  `;
+
   return `
-    <nav class="bg-navy border-b border-navy-light sticky top-0 z-40 shadow-md">
+    <nav class="bg-plum sticky top-0 z-40 shadow-md">
       <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-        <a href="index.html" class="flex items-center gap-2 text-gold font-bold text-lg tracking-wide hover:opacity-95">
-          <span class="text-2xl">⚖️</span>
-          <span>LMVS <span class="text-white/70 font-normal text-xs block md:inline">| Legal Metrology Portal</span></span>
+        <a href="index.html" class="text-white hover:opacity-95 flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-white/15 border border-white/25 flex items-center justify-center font-bold text-white text-sm">
+            LM
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="text-white text-base font-bold tracking-wide">LMVS</span>
+              <span class="text-[9px] bg-white/20 text-white px-1.5 py-0.2 rounded uppercase font-semibold tracking-wider">Gov</span>
+            </div>
+            <span class="text-white/75 font-normal text-[10px] block leading-none">Legal Metrology Portal</span>
+          </div>
         </a>
-        <button id="navToggle" type="button" class="md:hidden text-gold border border-gold/60 rounded px-2.5 py-1 text-sm focus:outline-none" aria-label="Toggle navigation">
-          ☰
-        </button>
-        <div id="navMenu" class="hidden md:flex items-center gap-6 text-sm">
-          ${links}
+
+        <div class="flex items-center gap-3">
+          <div id="navMenu" class="hidden md:flex items-center gap-5 text-sm">
+            ${links}
+            ${topOfficerBtn}
+            ${authSection}
+            ${themeBtn}
+          </div>
+          <div class="flex md:hidden items-center gap-2">
+            ${topOfficerBtn}
+            <button id="navToggle" type="button" class="text-white border border-white/30 rounded-md px-2.5 py-1 text-sm focus:outline-none" aria-label="Toggle navigation">
+              Menu
+            </button>
+          </div>
         </div>
       </div>
-      <div id="navMobile" class="hidden md:hidden px-4 pb-4 flex flex-col gap-3 text-sm border-t border-white/10 pt-3 bg-navy">
+      <div id="navMobile" class="hidden md:hidden px-4 pb-4 flex flex-col gap-3 text-sm border-t border-white/15 pt-3 bg-plum">
         ${links}
+        <div class="pt-2 border-t border-white/15 flex justify-between items-center">
+          <div class="flex items-center gap-2">
+            ${authSection}
+          </div>
+          ${themeBtn}
+        </div>
       </div>
     </nav>
   `;
@@ -784,44 +1019,54 @@ function renderNavbar(options = {}) {
 
 function renderFooter() {
   return `
-    <footer class="bg-navy text-white/80 py-8 text-sm mt-auto border-t border-navy-light">
-      <div class="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <footer class="bg-plum text-white/80 py-10 text-sm mt-auto">
+      <div class="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
         <div>
-          <div class="flex items-center gap-2 text-gold font-bold text-base mb-2">
-            <span>⚖️ Legal Metrology Verification System</span>
+          <div class="text-white font-semibold text-base mb-2.5 flex items-center gap-2">
+            <span>⚖ Legal Metrology Department</span>
           </div>
-          <p class="text-xs text-white/70 leading-relaxed">
-            Automating government verification of weighing and measuring instruments, issuing tamper-proof QR certificates, and empowering consumer grievance redressal.
+          <p class="text-xs text-white/75 leading-relaxed">
+            Statutory registry for commercial weighing &amp; measuring machines, online officer verification, shopkeeper compliance, and consumer protection.
           </p>
         </div>
         <div>
-          <h4 class="text-gold font-semibold text-xs uppercase tracking-wider mb-2">Quick Navigation</h4>
-          <ul class="text-xs space-y-1.5 text-white/70">
-            <li><a href="index.html" class="hover:text-gold transition-colors">Home & Overview</a></li>
-            <li><a href="verify.html" class="hover:text-gold transition-colors">Verify Certificate / Scan QR</a></li>
-            <li><a href="complaint.html" class="hover:text-gold transition-colors">Report Non-Compliant Business</a></li>
-            <li><a href="chatbot.html" class="hover:text-gold transition-colors">🤖 MetroBot AI Helpdesk</a></li>
-            <li><a href="login.html" class="hover:text-gold transition-colors">Owner & Officer Login</a></li>
+          <h4 class="text-white font-semibold text-xs uppercase tracking-wider mb-3">Core Portals</h4>
+          <ul class="text-xs space-y-2 text-white/75">
+            <li><a href="index.html" class="hover:text-white font-semibold">Home</a></li>
+            <li><a href="officer-dashboard.html" class="hover:text-white direct-officer-link font-semibold">Officer Verification Portal</a></li>
+            <li><a href="owner-dashboard.html" class="hover:text-white font-semibold">Machine Holder (Shopkeeper)</a></li>
+            <li><a href="complaint.html" class="hover:text-white font-semibold">File a Complaint</a></li>
+            <li><a href="chatbot.html" class="hover:text-white font-semibold">Help (MetroBot Chatbot)</a></li>
           </ul>
         </div>
         <div>
-          <h4 class="text-gold font-semibold text-xs uppercase tracking-wider mb-2">Statutory Compliance</h4>
-          <p class="text-xs text-white/70 leading-relaxed">
-            Operated pursuant to the Legal Metrology Act &amp; General Rules. All commercial instruments must be reverified annually.
+          <h4 class="text-white font-semibold text-xs uppercase tracking-wider mb-3">Verification &amp; Search</h4>
+          <ul class="text-xs space-y-2 text-white/75">
+            <li><a href="verify.html" class="hover:text-white">Verify Scale Certificate</a></li>
+            <li><a href="complaint.html#trackSection" class="hover:text-white">Track Complaint Status</a></li>
+            <li><a href="login.html" class="hover:text-white">Machine Holder Login</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-white font-semibold text-xs uppercase tracking-wider mb-3">Statutory Enforcement</h4>
+          <p class="text-xs text-white/75 leading-relaxed mb-3">
+            Pursuant to Legal Metrology Act, 2009. Annual verification mandatory for commercial scales.
           </p>
-          <div class="mt-3 flex items-center gap-2 text-[11px] text-gold/90 font-medium">
-            <span>🔒 Official Legal Metrology Registry</span>
+          <div class="p-2.5 bg-white/10 rounded-lg text-[11px] text-white/80">
+            National Consumer Helpline: <span class="text-white font-mono font-semibold">1800-11-4000</span>
           </div>
         </div>
       </div>
-      <div class="border-t border-white/10 pt-4 text-center text-xs text-white/50">
-        Department of Consumer Affairs &bull; Legal Metrology &copy; ${new Date().getFullYear()} All Rights Reserved.
+      <div class="border-t border-white/15 pt-5 text-center text-xs text-white/60">
+        Department of Consumer Affairs · Legal Metrology Enforcement Division &copy; ${new Date().getFullYear()}
       </div>
     </footer>
   `;
 }
 
 function initNavbar(options = {}) {
+  initTheme();
+
   const container = document.getElementById('navbar-container');
   if (!container) return;
   container.innerHTML = renderNavbar(options);
@@ -831,6 +1076,25 @@ function initNavbar(options = {}) {
   if (toggle && mobile) {
     toggle.addEventListener('click', () => mobile.classList.toggle('hidden'));
   }
+
+  // Handle direct officer navigation click anywhere on the page
+  document.querySelectorAll('.direct-officer-btn, .direct-officer-link').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      const u = getCurrentUser();
+      if (!u || u.role !== 'Officer') {
+        e.preventDefault();
+        directOfficerAccess();
+      }
+    });
+  });
+
+  // Theme switcher handlers
+  document.querySelectorAll('.theme-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      toggleTheme();
+    });
+  });
 
   const logoutBtns = document.querySelectorAll('#logoutBtn');
   logoutBtns.forEach((btn) => {
@@ -855,95 +1119,95 @@ const METROBOT_KB = [
   {
     patterns: [/\b(hi|hello|hey|good\s*(morning|afternoon|evening)|namaste|halo|helo)\b/i],
     responses: [
-      "👋 Hello! Welcome to the <strong>Legal Metrology Verification System</strong>. I'm MetroBot, your automated assistant. How can I help you today?",
-      "👋 Namaste! I'm MetroBot. Ask me anything about scale verification, certificate renewals, complaints, or regulations."
+      " Hello! Welcome to the <strong>Legal Metrology Verification System</strong>. I'm MetroBot, your automated assistant. How can I help you today?",
+      " Namaste! I'm MetroBot. Ask me anything about scale verification, certificate renewals, complaints, or regulations."
     ]
   },
   {
     patterns: [/\b(who are you|what are you|your name|introduce yourself|what is metrobot)\b/i],
     responses: [
-      "I'm <strong>MetroBot</strong> 🤖 &mdash; an AI assistant for the <strong>Legal Metrology Department</strong>. I can help you with:<ul><li>🔍 Certificate verification</li><li>📝 Filing complaints</li><li>⚖️ Understanding stamping regulations</li><li>📅 Renewal timelines &amp; fees</li></ul>What would you like to know?"
+      "I'm <strong>MetroBot</strong>  &mdash; an AI assistant for the <strong>Legal Metrology Department</strong>. I can help you with:<ul><li> Certificate verification</li><li> Filing complaints</li><li> Understanding stamping regulations</li><li> Renewal timelines &amp; fees</li></ul>What would you like to know?"
     ]
   },
   {
     patterns: [/\b(what is legal metrology|legal metrology mean|about legal metrology|explain metrology)\b/i],
     responses: [
-      "<strong>Legal Metrology</strong> ⚖️ is the branch of measurement science dealing with mandatory government standards.<br><br>In India, it ensures:<ul><li>Accuracy of weighing &amp; measuring instruments used in retail and industry</li><li>Protection of consumers from under-weight commodities</li><li>Mandatory annual certification &amp; stamping under the <strong>Legal Metrology Act, 2009</strong></li></ul>"
+      "<strong>Legal Metrology</strong>  is the branch of measurement science dealing with mandatory government standards.<br><br>In India, it ensures:<ul><li>Accuracy of weighing &amp; measuring instruments used in retail and industry</li><li>Protection of consumers from under-weight commodities</li><li>Mandatory annual certification &amp; stamping under the <strong>Legal Metrology Act, 2009</strong></li></ul>"
     ]
   },
   {
     patterns: [/\b(verify|verification|check|validate|certificate|cert)\b.*\b(how|steps|process|procedure|guide)\b|\b(how to|how do i|steps to|process for|procedure for)\b.*\b(verify|verification|check|validate|certificate)\b/i],
     responses: [
-      "To verify an instrument certificate:<br><br><strong>Step 1</strong> &ndash; Go to the <a href='verify.html' class='text-gold font-bold underline'>Verification Page</a>.<br><strong>Step 2</strong> &ndash; Enter the <strong>Certificate Code</strong> (e.g. <code>CERT-2026-104921</code>) or scan the <strong>QR code</strong> sticker on the machine.<br><strong>Step 3</strong> &ndash; View the live compliance status (🟢 Valid, 🟡 Renewal Due, or 🔴 Expired)."
+      "To verify an instrument certificate:<br><br><strong>Step 1</strong> &ndash; Go to the <a href='verify.html' class='text-gold font-bold underline'>Verification Page</a>.<br><strong>Step 2</strong> &ndash; Enter the <strong>Certificate Code</strong> (e.g. <code>CERT-2026-104921</code>) or scan the <strong>QR code</strong> sticker on the machine.<br><strong>Step 3</strong> &ndash; View the live compliance status ( Valid,  Renewal Due, or  Expired)."
     ]
   },
   {
     patterns: [/\b(qr|qr code|scan|barcode)\b/i],
     responses: [
-      "📷 <strong>QR Code Verification:</strong><br><br>Every verified instrument carries an official QR Code certificate sticker. You can:<ul><li>Scan it directly using your phone camera or our <a href='verify.html' class='text-gold font-bold underline'>Scan &amp; Verify Page</a></li><li>Check shop name, serial number, and exact expiry date in real-time</li></ul>"
+      " <strong>QR Code Verification:</strong><br><br>Every verified instrument carries an official QR Code certificate sticker. You can:<ul><li>Scan it directly using your phone camera or our <a href='verify.html' class='text-gold font-bold underline'>Scan &amp; Verify Page</a></li><li>Check shop name, serial number, and exact expiry date in real-time</li></ul>"
     ]
   },
   {
     patterns: [/\b(complaint|complain|report|lodge|file|submit|raise)\b.*\b(how|process|steps|where)\b|\b(how to|how do i|where to|steps to)\b.*\b(complaint|complain|report|lodge|file)\b/i],
     responses: [
-      "📋 <strong>Filing a Non-Compliance Grievance:</strong><br><br><strong>Step 1</strong> &ndash; Visit the <a href='complaint.html' class='text-gold font-bold underline'>File Complaint Page</a>.<br><strong>Step 2</strong> &ndash; Enter seller name, shop address, and violation type.<br><strong>Step 3</strong> &ndash; Attach photo evidence of inaccurate scale or forged stamp.<br><strong>Step 4</strong> &ndash; Submit to receive an official <strong>Complaint Tracking Reference</strong>.<br><br>⏳ Action is initiated by enforcement officers within <strong>7 working days</strong>."
+      " <strong>Filing a Non-Compliance Grievance:</strong><br><br><strong>Step 1</strong> &ndash; Visit the <a href='complaint.html' class='text-gold font-bold underline'>File Complaint Page</a>.<br><strong>Step 2</strong> &ndash; Enter seller name, shop address, and violation type.<br><strong>Step 3</strong> &ndash; Attach photo evidence of inaccurate scale or forged stamp.<br><strong>Step 4</strong> &ndash; Submit to receive an official <strong>Complaint Tracking Reference</strong>.<br><br> Action is initiated by enforcement officers within <strong>7 working days</strong>."
     ]
   },
   {
     patterns: [/\b(track|status|check status|follow up|update)\b.*\b(complaint|application)\b|\b(complaint|application)\b.*\b(status|track|update)\b/i],
     responses: [
-      "🔍 <strong>Track Complaint Status:</strong><br><br>Enter your reference code (e.g. <code>CMP-2026-849201</code>) on the <a href='complaint.html' class='text-gold font-bold underline'>Complaint Tracking Section</a>.<br><br><strong>Status codes:</strong><ul><li>⏳ <strong>Pending:</strong> Under queue review</li><li>👮 <strong>Action Taken:</strong> Officer assigned &amp; inspection conducted</li><li>✅ <strong>Resolved:</strong> Machine seized or compliance enforced</li></ul>"
+      " <strong>Track Complaint Status:</strong><br><br>Enter your reference code (e.g. <code>CMP-2026-849201</code>) on the <a href='complaint.html' class='text-gold font-bold underline'>Complaint Tracking Section</a>.<br><br><strong>Status codes:</strong><ul><li> <strong>Pending:</strong> Under queue review</li><li> <strong>Action Taken:</strong> Officer assigned &amp; inspection conducted</li><li> <strong>Resolved:</strong> Machine seized or compliance enforced</li></ul>"
     ]
   },
   {
     patterns: [/\b(documents?|docs?|required|need|papers?|submit)\b.*\b(certif|verif|stamping|apply|application|renewal)\b|\b(what documents?|what papers?)\b/i],
     responses: [
-      "📄 <strong>Documents Required for Stamping:</strong><br><br><ul><li>✅ Trade License / GST Registration Certificate</li><li>✅ Previous verification certificate (for renewals)</li><li>✅ Machine purchase invoice &amp; serial number model specification</li><li>✅ Owner identity proof (Aadhaar / PAN)</li><li>✅ Clear photo of machine model plate</li></ul>"
+      " <strong>Documents Required for Stamping:</strong><br><br><ul><li> Trade License / GST Registration Certificate</li><li> Previous verification certificate (for renewals)</li><li> Machine purchase invoice &amp; serial number model specification</li><li> Owner identity proof (Aadhaar / PAN)</li><li> Clear photo of machine model plate</li></ul>"
     ]
   },
   {
     patterns: [/\b(renew|renewal|re-verify|reissue|expired certificate)\b/i],
     responses: [
-      "🔄 <strong>Annual Re-verification:</strong><br><br>Verification certificates are valid for <strong>12 months</strong>. Business owners should:<ul><li>Submit renewal on the <a href='owner-dashboard.html' class='text-gold font-bold underline'>Seller Dashboard</a> within 30 days before expiry</li><li>Keep the instrument calibrated for physical inspector stamping</li></ul>⚠️ <em>Trading with an expired certificate attracts penalties under Section 24 of the Act.</em>"
+      " <strong>Annual Re-verification:</strong><br><br>Verification certificates are valid for <strong>12 months</strong>. Business owners should:<ul><li>Submit renewal on the <a href='owner-dashboard.html' class='text-gold font-bold underline'>Seller Dashboard</a> within 30 days before expiry</li><li>Keep the instrument calibrated for physical inspector stamping</li></ul> <em>Trading with an expired certificate attracts penalties under Section 24 of the Act.</em>"
     ]
   },
   {
     patterns: [/\b(fee|fees|charge|cost|payment|pay|price|amount|how much)\b/i],
     responses: [
-      "💰 <strong>Government Verification Fees (Indicative):</strong><br><br><ul><li>⚖️ Counter &amp; Bench Scales: ₹100 &ndash; ₹300</li><li>🏭 Platform Scales &amp; Industrial Units: ₹500 &ndash; ₹1,500</li><li>🚚 Weighbridges (50 Ton+): ₹2,000 &ndash; ₹5,000</li><li>⛽ Fuel &amp; Liquid Dispensers: ₹500 &ndash; ₹1,000</li></ul>"
+      " <strong>Government Verification Fees (Indicative):</strong><br><br><ul><li> Counter &amp; Bench Scales: ₹100 &ndash; ₹300</li><li> Platform Scales &amp; Industrial Units: ₹500 &ndash; ₹1,500</li><li>🚚 Weighbridges (50 Ton+): ₹2,000 &ndash; ₹5,000</li><li>⛽ Fuel &amp; Liquid Dispensers: ₹500 &ndash; ₹1,000</li></ul>"
     ]
   },
   {
     patterns: [/\b(penalty|penalt|fine|punish|illegal|offence|offense|violation|law|act)\b/i],
     responses: [
-      "⚠️ <strong>Statutory Penalties (Legal Metrology Act, 2009):</strong><br><br><ul><li><strong>Unverified Instrument:</strong> Fine up to ₹25,000 and up to 6 months imprisonment</li><li><strong>Tampering with Seal/Scale:</strong> Fine up to ₹50,000 and up to 1 year imprisonment</li><li><strong>Counterfeit Stamp / Fake Certificate:</strong> Fine up to ₹1,00,000 and up to 2 years imprisonment</li></ul>"
+      " <strong>Statutory Penalties (Legal Metrology Act, 2009):</strong><br><br><ul><li><strong>Unverified Instrument:</strong> Fine up to ₹25,000 and up to 6 months imprisonment</li><li><strong>Tampering with Seal/Scale:</strong> Fine up to ₹50,000 and up to 1 year imprisonment</li><li><strong>Counterfeit Stamp / Fake Certificate:</strong> Fine up to ₹1,00,000 and up to 2 years imprisonment</li></ul>"
     ]
   },
   {
     patterns: [/\b(login|demo|credentials|password|email|officer login|seller login)\b/i],
     responses: [
-      "🔑 <strong>Demo Access Credentials:</strong><br><br><strong>Legal Metrology Officer:</strong><br>&bull; Email: <code>officer@lmvs.gov</code><br>&bull; Password: <code>Officer@123</code><br><br><strong>Demo Business Owner:</strong><br>&bull; Email: <code>owner@example.com</code><br>&bull; Password: <code>Owner@123</code><br><br><a href='login.html' class='text-gold font-bold underline'>Go to Login Page &rarr;</a>"
+      " <strong>Demo Access Credentials:</strong><br><br><strong>Legal Metrology Officer:</strong><br>&bull; Email: <code>officer@lmvs.gov</code><br>&bull; Password: <code>Officer@123</code><br><br><strong>Demo Business Owner:</strong><br>&bull; Email: <code>owner@example.com</code><br>&bull; Password: <code>Owner@123</code><br><br><a href='login.html' class='text-gold font-bold underline'>Go to Login Page &rarr;</a>"
     ]
   },
   {
     patterns: [/\b(thank|thanks|thank you|thx|tysm|bye|goodbye|see you|exit|done)\b/i],
     responses: [
-      "😊 You're welcome! Feel free to ask anytime. Stay compliant and accurate! 🇮🇳",
-      "👋 Glad to help! Thank you for using the Legal Metrology Verification System."
+      " You're welcome! Feel free to ask anytime. Stay compliant and accurate! ",
+      " Glad to help! Thank you for using the Legal Metrology Verification System."
     ]
   },
   {
     patterns: [/\b(help|what can you do|options|menu|commands|features)\b/i],
     responses: [
-      "🛍️ <strong>Here are top things you can ask me:</strong><br><br><ul><li>🔍 <em>How to verify a certificate?</em></li><li>📝 <em>How to report a dishonest seller?</em></li><li>📄 <em>What documents are needed for stamping?</em></li><li>🔄 <em>How does renewal work?</em></li><li>💰 <em>What are the verification fees?</em></li><li>🔑 <em>What are the demo login details?</em></li></ul>"
+      " <strong>Here are top things you can ask me:</strong><br><br><ul><li> <em>How to verify a certificate?</em></li><li> <em>How to report a dishonest seller?</em></li><li> <em>What documents are needed for stamping?</em></li><li> <em>How does renewal work?</em></li><li> <em>What are the verification fees?</em></li><li> <em>What are the demo login details?</em></li></ul>"
     ]
   }
 ];
 
 const METROBOT_FALLBACKS = [
-  "🤔 I'm not completely sure about that specific query. You can ask me about: certificate verification, filing complaints, required documents, or renewal rules.",
-  "💡 Try clicking one of the quick question chips above, or ask about: verification, penalties, demo login, or fees.",
-  "🔍 I didn't quite catch that. Try asking questions like 'How to verify certificate?' or 'What are the penalties?'"
+  " I'm not completely sure about that specific query. You can ask me about: certificate verification, filing complaints, required documents, or renewal rules.",
+  " Try clicking one of the quick question chips above, or ask about: verification, penalties, demo login, or fees.",
+  " I didn't quite catch that. Try asking questions like 'How to verify certificate?' or 'What are the penalties?'"
 ];
 
 function initChatbotWidget() {
@@ -955,86 +1219,56 @@ function initChatbotWidget() {
   wrapper.id = 'metrobotWidgetWrapper';
   wrapper.innerHTML = `
     <!-- Floating Trigger Button -->
-    <button id="metrobotTriggerBtn" type="button" aria-label="Open MetroBot AI Helpdesk"
-      class="fixed bottom-6 right-6 z-50 bg-gradient-to-br from-navy via-navy-light to-slate-900 text-gold border-2 border-gold/70 px-4 py-3.5 rounded-full shadow-2xl hover:shadow-gold/30 hover:scale-105 transition-all duration-300 flex items-center gap-2.5 group">
-      <span class="text-2xl animate-bounce">🤖</span>
+    <button id="metrobotTriggerBtn" type="button" aria-label="Open MetroBot helpdesk"
+      class="fixed bottom-6 right-6 z-50 bg-plum text-white px-4 py-3 rounded-full flex items-center gap-2 shadow-plum hover:bg-plum-dark transition-all">
       <div class="text-left hidden sm:block">
-        <span class="block text-xs font-black text-white group-hover:text-gold transition-colors leading-none">MetroBot AI</span>
-        <span class="text-[10px] text-gold/80 font-medium">Ask Assistant</span>
+        <span class="block text-xs font-semibold text-white leading-none">MetroBot</span>
+        <span class="text-[10px] text-white/80 font-medium">Ask assistant</span>
       </div>
-      <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse ml-0.5"></span>
     </button>
 
-    <!-- Slide-up Chat Window -->
-    <div id="metrobotChatModal" class="hidden fixed bottom-6 right-4 sm:right-6 z-50 w-[94vw] sm:w-[390px] h-[540px] max-h-[85vh] bg-[#0F2238] border border-gold/40 rounded-2xl shadow-2xl flex-col overflow-hidden backdrop-blur-lg">
-      <!-- Header -->
-      <div class="bg-gradient-to-r from-navy to-navy-light px-4 py-3 border-b border-gold/25 flex items-center justify-between flex-shrink-0">
-        <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-gold to-sky-500 flex items-center justify-center text-lg shadow">
-            🤖
-          </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <h3 class="font-bold text-sm text-white tracking-wide">MetroBot AI</h3>
-              <span class="text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-1.5 py-0.2 rounded-full font-semibold">Online</span>
-            </div>
-            <p class="text-[10px] text-gold/80">Legal Metrology Helpdesk</p>
-          </div>
+    <div id="metrobotChatModal" class="hidden fixed bottom-6 right-4 sm:right-6 z-50 w-[94vw] sm:w-[390px] h-[540px] max-h-[85vh] bg-white border border-milk-line rounded-xl shadow-lg flex-col overflow-hidden text-slate-800">
+      <div class="bg-plum px-4 py-3 border-b border-white/10 flex items-center justify-between flex-shrink-0">
+        <div>
+          <h3 class="font-semibold text-sm text-white tracking-wide">MetroBot</h3>
+          <p class="text-[10px] text-white/80 font-medium">Legal Metrology helpdesk</p>
         </div>
         <div class="flex items-center gap-1.5">
-          <a href="chatbot.html" target="_blank" title="Open Full Screen in New Tab" class="text-slate-400 hover:text-white p-1 rounded hover:bg-white/10 text-xs transition-colors">
-            ↗️
-          </a>
-          <button id="metrobotClearBtn" type="button" title="Clear Chat History" class="text-slate-400 hover:text-amber-300 p-1 rounded hover:bg-white/10 text-xs transition-colors">
-            🧹
-          </button>
-          <button id="metrobotCloseBtn" type="button" title="Minimize Chat" class="text-slate-400 hover:text-red-300 p-1 rounded hover:bg-white/10 text-base font-bold transition-colors">
-            ✕
-          </button>
+          <a href="chatbot.html" target="_blank" title="Open full page" class="text-white/80 hover:text-white p-1 rounded text-xs">Open</a>
+          <button id="metrobotClearBtn" type="button" title="Clear chat" class="text-white/80 hover:text-white p-1 rounded text-xs">Clear</button>
+          <button id="metrobotCloseBtn" type="button" title="Close" class="text-white/80 hover:text-white p-1 rounded text-base font-bold">✕</button>
         </div>
       </div>
 
-      <!-- Quick Chips Bar -->
-      <div class="bg-[#122842] px-3 py-2 border-b border-gold/15 flex gap-1.5 overflow-x-auto no-scrollbar flex-shrink-0 text-[11px]">
-        <button type="button" class="metro-chip bg-navy-light/80 hover:bg-gold/20 text-gold-light border border-gold/30 rounded-full px-2.5 py-1 whitespace-nowrap transition-colors" data-query="How to verify a certificate?">🔍 Verify</button>
-        <button type="button" class="metro-chip bg-navy-light/80 hover:bg-gold/20 text-gold-light border border-gold/30 rounded-full px-2.5 py-1 whitespace-nowrap transition-colors" data-query="How to file a complaint?">📝 Complaint</button>
-        <button type="button" class="metro-chip bg-navy-light/80 hover:bg-gold/20 text-gold-light border border-gold/30 rounded-full px-2.5 py-1 whitespace-nowrap transition-colors" data-query="What are the verification fees?">💰 Fees</button>
-        <button type="button" class="metro-chip bg-navy-light/80 hover:bg-gold/20 text-gold-light border border-gold/30 rounded-full px-2.5 py-1 whitespace-nowrap transition-colors" data-query="What are the penalties?">⚠️ Penalties</button>
-        <button type="button" class="metro-chip bg-navy-light/80 hover:bg-gold/20 text-gold-light border border-gold/30 rounded-full px-2.5 py-1 whitespace-nowrap transition-colors" data-query="What is legal metrology?">⚖️ Info</button>
+      <div class="bg-milk-deep px-3 py-2 border-b border-milk-line flex gap-1.5 overflow-x-auto no-scrollbar flex-shrink-0 text-[11px]">
+        <button type="button" class="metro-chip bg-white hover:bg-milk text-plum border border-milk-line rounded-full px-2.5 py-1 whitespace-nowrap" data-query="How to verify a certificate?">Verify</button>
+        <button type="button" class="metro-chip bg-white hover:bg-milk text-plum border border-milk-line rounded-full px-2.5 py-1 whitespace-nowrap" data-query="How to file a complaint?">Complaint</button>
+        <button type="button" class="metro-chip bg-white hover:bg-milk text-plum border border-milk-line rounded-full px-2.5 py-1 whitespace-nowrap" data-query="What are the verification fees?">Fees</button>
+        <button type="button" class="metro-chip bg-white hover:bg-milk text-plum border border-milk-line rounded-full px-2.5 py-1 whitespace-nowrap" data-query="What are the penalties?">Penalties</button>
+        <button type="button" class="metro-chip bg-white hover:bg-milk text-plum border border-milk-line rounded-full px-2.5 py-1 whitespace-nowrap" data-query="What is legal metrology?">Info</button>
       </div>
 
-      <!-- Messages Area -->
-      <div id="metrobotMessages" class="flex-1 overflow-y-auto p-4 space-y-3 text-xs leading-relaxed">
+      <div id="metrobotMessages" class="flex-1 overflow-y-auto p-4 space-y-3 text-xs leading-relaxed bg-milk">
         <div class="flex gap-2 items-end">
-          <div class="w-6 h-6 rounded-full bg-gold/20 text-gold flex items-center justify-center text-xs flex-shrink-0">🤖</div>
-          <div class="bg-[#183454] border border-white/10 rounded-2xl rounded-bl-sm p-3 text-slate-100 max-w-[85%] shadow-sm">
-            👋 Namaste! I'm <strong>MetroBot</strong>, your Legal Metrology Assistant. How can I assist you with weighing scale compliance, certificate verification, or complaints today?
+          <div class="bg-white border border-milk-line rounded-xl rounded-bl-sm p-3 text-slate-700 max-w-[85%]">
+            Hello. I am MetroBot, the Legal Metrology assistant. Ask about certificate verification, complaints, or compliance.
             <span class="block text-[9px] text-slate-400 mt-1 text-right">Just now</span>
           </div>
         </div>
       </div>
 
-      <!-- Typing Indicator -->
-      <div id="metrobotTyping" class="hidden px-4 pb-2">
-        <div class="flex gap-2 items-center">
-          <div class="w-6 h-6 rounded-full bg-gold/20 text-gold flex items-center justify-center text-xs">🤖</div>
-          <div class="bg-[#183454] px-3 py-2 rounded-xl text-[11px] text-gold flex items-center gap-1">
-            <span class="animate-bounce">●</span>
-            <span class="animate-bounce [animation-delay:0.2s]">●</span>
-            <span class="animate-bounce [animation-delay:0.4s]">●</span>
-          </div>
+      <div id="metrobotTyping" class="hidden px-4 pb-2 bg-milk">
+        <div class="bg-white px-3 py-2 rounded-lg text-[11px] text-plum border border-milk-line inline-flex gap-1">
+          <span>●</span><span>●</span><span>●</span>
         </div>
       </div>
 
-      <!-- Input Bar -->
-      <form id="metrobotInputForm" class="p-3 bg-navy border-t border-gold/20 flex gap-2 items-center flex-shrink-0">
+      <form id="metrobotInputForm" class="p-3 bg-white border-t border-milk-line flex gap-2 items-center flex-shrink-0">
         <input type="text" id="metrobotInputText" placeholder="Ask about verification, complaints, rules..." autocomplete="off"
-          class="flex-1 bg-[#162D4A] border border-gold/30 text-white placeholder-slate-400 text-xs px-3.5 py-2.5 rounded-xl focus:outline-none focus:ring-1 focus:ring-gold">
+          class="flex-1 bg-milk border border-milk-line focus:border-plum text-slate-800 placeholder-slate-400 text-xs px-3.5 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-plum">
         <button type="submit" id="metrobotSendBtn" aria-label="Send message"
-          class="bg-gold hover:bg-gold-light text-navy font-bold p-2.5 rounded-xl transition-transform active:scale-95 shadow">
-          <svg class="w-4 h-4 transform rotate-90" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-          </svg>
+          class="btn-primary p-2.5 rounded-lg">
+          Send
         </button>
       </form>
     </div>
@@ -1071,8 +1305,7 @@ function initChatbotWidget() {
   clearBtn.addEventListener('click', () => {
     messages.innerHTML = `
       <div class="flex gap-2 items-end">
-        <div class="w-6 h-6 rounded-full bg-gold/20 text-gold flex items-center justify-center text-xs flex-shrink-0">🤖</div>
-        <div class="bg-[#183454] border border-white/10 rounded-2xl rounded-bl-sm p-3 text-slate-100 max-w-[85%] shadow-sm">
+        <div class="bg-white border border-milk-line rounded-xl rounded-bl-sm p-3 text-slate-700 max-w-[85%]">
           Chat cleared. How else can I assist you with Legal Metrology today?
           <span class="block text-[9px] text-slate-400 mt-1 text-right">Just now</span>
         </div>
@@ -1101,9 +1334,9 @@ function initChatbotWidget() {
     const userRow = document.createElement('div');
     userRow.className = 'flex gap-2 items-end justify-end';
     userRow.innerHTML = `
-      <div class="bg-gradient-to-r from-sky-600 to-navy-light text-white rounded-2xl rounded-br-sm p-3 max-w-[85%] shadow-sm">
+      <div class="bg-plum text-white rounded-xl rounded-br-sm p-3 max-w-[85%]">
         ${escapeHtml(query)}
-        <span class="block text-[9px] text-sky-200/80 mt-1 text-right">You</span>
+        <span class="block text-[9px] text-white/80 mt-1 text-right">You</span>
       </div>
     `;
     messages.appendChild(userRow);
@@ -1135,8 +1368,7 @@ function initChatbotWidget() {
       const botRow = document.createElement('div');
       botRow.className = 'flex gap-2 items-end';
       botRow.innerHTML = `
-        <div class="w-6 h-6 rounded-full bg-gold/20 text-gold flex items-center justify-center text-xs flex-shrink-0">🤖</div>
-        <div class="bg-[#183454] border border-white/10 rounded-2xl rounded-bl-sm p-3 text-slate-100 max-w-[85%] shadow-sm">
+        <div class="bg-white border border-milk-line rounded-xl rounded-bl-sm p-3 text-slate-700 max-w-[85%]">
           ${reply}
           <span class="block text-[9px] text-slate-400 mt-1 text-right">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
         </div>
@@ -1164,14 +1396,28 @@ function initFooter() {
 function requireAuth(requiredRole) {
   const user = getCurrentUser();
   const token = getToken();
+
   if (!user || !token) {
-    window.location.href = 'login.html';
+    if (requiredRole === 'Officer') {
+      window.location.href = 'login.html?role=officer';
+    } else {
+      window.location.href = 'login.html';
+    }
     return null;
   }
+
   if (requiredRole && user.role !== requiredRole) {
+    if (requiredRole === 'Officer') {
+      showToast('Access Denied: Officer Dashboard requires an authenticated Legal Metrology Officer session with ID starting with 113iom.', 'error');
+      setTimeout(() => {
+        window.location.href = 'login.html?role=officer';
+      }, 700);
+      return null;
+    }
     window.location.href = user.role === 'Owner' ? 'owner-dashboard.html' : 'officer-dashboard.html';
     return null;
   }
+
   return user;
 }
 
@@ -1200,6 +1446,11 @@ function initModalClose(id) {
   modal.addEventListener('click', (e) => {
     if (e.target === modal) closeModal(id);
   });
+}
+
+// Alias for backward-compatibility (index.html quick verify uses getCertificateStatus)
+function getCertificateStatus(expiryDate) {
+  return getRenewalStatus(expiryDate);
 }
 
 function printElement(elId) {

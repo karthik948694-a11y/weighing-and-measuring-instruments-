@@ -5,26 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Public Certificate Verification | Legal Metrology</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="js/tailwind-config.js"></script>
-  <link rel="stylesheet" href="css/style.css">
+  <script src="tailwind-config.js"></script>
+  <link rel="stylesheet" href="style.css">
   <!-- html5-qrcode for Camera Scanning -->
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 </head>
-<body class="min-h-screen flex flex-col bg-slate-50 text-slate-800">
+<body class="min-h-screen flex flex-col bg-calibration-pattern text-slate-900 transition-colors duration-300">
 
   <div id="navbar-container"></div>
 
   <main class="flex-1 pb-16">
     <!-- Header -->
-    <div class="bg-gradient-to-r from-navy via-navy-light to-slate-900 text-white py-10 shadow-md">
+    <div class="bg-plum text-white py-10">
       <div class="max-w-4xl mx-auto px-4 text-center">
-        <div class="inline-flex items-center gap-2 bg-gold/20 text-gold text-xs font-semibold px-3 py-1 rounded-full mb-3 uppercase tracking-wider">
-          <span>🔍 National Public Verification Registry</span>
+        <div class="inline-flex items-center gap-2 bg-white/15 text-white text-xs font-medium px-3 py-1 rounded-full mb-3 uppercase tracking-wider">
+          Public verification registry
         </div>
-        <h1 class="text-2xl sm:text-4xl font-extrabold text-white">
+        <h1 class="text-2xl sm:text-4xl font-bold text-white">
           Verify Commercial Instrument Certificate
         </h1>
-        <p class="text-xs sm:text-sm text-slate-200/90 mt-2 max-w-xl mx-auto">
+        <p class="text-xs sm:text-sm text-white/80 mt-2 max-w-xl mx-auto">
           Scan the certificate QR code or type the special certificate ID to confirm the authenticity, business owner, and legal validity.
         </p>
       </div>
@@ -33,27 +33,26 @@
     <div class="max-w-3xl mx-auto px-4 -mt-6">
 
       <!-- Search & Scanner Input Card -->
-      <div class="bg-white rounded-2xl shadow-xl p-6 border border-slate-200/80">
-        <!-- Input Method Tabs -->
-        <div class="flex border-b border-slate-200 mb-6 text-xs sm:text-sm font-semibold">
+      <div class="glass-panel p-6 rounded-xl bg-white">
+        <div class="flex border-b border-milk-line mb-6 text-xs sm:text-sm font-semibold">
           <button type="button" id="tabCodeBtn"
-            class="flex-1 pb-3 text-center text-navy border-b-2 border-gold transition-colors flex items-center justify-center gap-1.5">
-            <span>⌨️ Enter Special Code</span>
+            class="flex-1 pb-3 text-center text-plum border-b-2 border-plum font-semibold">
+            Enter code
           </button>
           <button type="button" id="tabScanBtn"
-            class="flex-1 pb-3 text-center text-slate-400 hover:text-navy border-b-2 border-transparent transition-colors flex items-center justify-center gap-1.5">
-            <span>📷 Live Camera QR Scanner</span>
+            class="flex-1 pb-3 text-center text-slate-400 hover:text-slate-900 border-b-2 border-transparent">
+            Camera scanner
           </button>
         </div>
 
         <!-- FORM: Enter Code -->
         <div id="codeEntrySection">
           <form id="verifyForm" class="flex flex-col sm:flex-row gap-3">
-            <input type="text" id="certCodeInput" placeholder="Enter code (e.g. CERT-2026-849201)..."
-              class="flex-1 border border-slate-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold font-mono font-medium">
+            <input type="text" id="certCodeInput" placeholder="Enter code (e.g. CERT-2026-849201)"
+              class="flex-1 border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-plum focus:border-plum font-mono font-medium bg-white text-slate-900">
             <button type="submit" id="lookupBtn"
-              class="bg-navy hover:bg-navy-light text-gold font-bold px-6 py-3 rounded-xl text-sm transition-all shadow flex items-center justify-center gap-2">
-              <span>🔍 Verify Certificate</span>
+              class="btn-primary px-6 py-3 rounded-lg text-sm">
+              Verify certificate
             </button>
           </form>
           <p class="text-[11px] text-slate-400 mt-2 text-center sm:text-left">
@@ -66,15 +65,15 @@
           <div class="max-w-md mx-auto">
             <div id="reader"></div>
             <div class="flex justify-center gap-3 mt-4 text-xs">
-              <button type="button" id="startScanBtn" class="bg-navy hover:bg-navy-light text-gold font-bold px-4 py-2 rounded-xl transition-colors shadow">
-                ▶️ Start Camera Scanner
+              <button type="button" id="startScanBtn" class="btn-brass px-5 py-2.5 rounded-lg">
+                Start camera
               </button>
-              <button type="button" id="stopScanBtn" class="hidden bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold px-4 py-2 rounded-xl transition-colors">
-                ⏹️ Stop Camera
+              <button type="button" id="stopScanBtn" class="hidden btn-secondary px-5 py-2.5 rounded-lg">
+                Stop camera
               </button>
             </div>
             <p class="text-[11px] text-slate-400 text-center mt-2">
-              Point your camera at the QR code printed on the machine or certificate.
+              Point your camera at the QR code printed on the machine or certificate sticker.
             </p>
           </div>
         </div>
@@ -90,7 +89,7 @@
 
   <div id="footer-container"></div>
 
-  <script src="js/script.js"></script>
+  <script src="script.js"></script>
   <script>
     initNavbar({ activePage: 'verify' });
     initFooter();
@@ -105,16 +104,16 @@
     let html5QrCode = null;
 
     tabCodeBtn.addEventListener('click', () => {
-      tabCodeBtn.className = 'flex-1 pb-3 text-center text-navy border-b-2 border-gold font-semibold transition-colors flex items-center justify-center gap-1.5';
-      tabScanBtn.className = 'flex-1 pb-3 text-center text-slate-400 hover:text-navy border-b-2 border-transparent font-semibold transition-colors flex items-center justify-center gap-1.5';
+      tabCodeBtn.className = 'flex-1 pb-3 text-center text-plum border-b-2 border-plum font-semibold';
+      tabScanBtn.className = 'flex-1 pb-3 text-center text-slate-400 hover:text-slate-900 border-b-2 border-transparent font-medium transition-colors flex items-center justify-center gap-1.5';
       codeEntrySection.classList.remove('hidden');
       scannerSection.classList.add('hidden');
       stopScanner();
     });
 
     tabScanBtn.addEventListener('click', () => {
-      tabScanBtn.className = 'flex-1 pb-3 text-center text-navy border-b-2 border-gold font-semibold transition-colors flex items-center justify-center gap-1.5';
-      tabCodeBtn.className = 'flex-1 pb-3 text-center text-slate-400 hover:text-navy border-b-2 border-transparent font-semibold transition-colors flex items-center justify-center gap-1.5';
+      tabScanBtn.className = 'flex-1 pb-3 text-center text-plum border-b-2 border-plum font-semibold';
+      tabCodeBtn.className = 'flex-1 pb-3 text-center text-slate-400 hover:text-slate-900 border-b-2 border-transparent font-medium transition-colors flex items-center justify-center gap-1.5';
       codeEntrySection.classList.add('hidden');
       scannerSection.classList.remove('hidden');
       startScanner();
@@ -179,8 +178,7 @@
 
       container.innerHTML = `
         <div class="bg-white rounded-2xl shadow-md p-8 text-center border border-slate-200">
-          <span class="animate-spin inline-block text-2xl mb-2">⏳</span>
-          <p class="text-sm font-semibold text-slate-700">Verifying code with Official Government Registry...</p>
+          <p class="text-sm font-medium text-slate-700">Verifying with the registry...</p>
         </div>
       `;
 
@@ -197,26 +195,26 @@
       const cert = data.certificate;
       const alert = data.alert || {};
 
-      let bannerBg = 'bg-green-600 text-white';
-      let bannerTitle = '✅ OFFICIALLY VERIFIED &amp; COMPLIANT';
+      let bannerBg = 'bg-teal-700 text-white';
+      let bannerTitle = 'Verified and compliant';
       let bannerSubtitle = 'This weighing / measuring instrument holds an active, verified government certificate.';
 
       if (alert.level === 'yellow') {
-        bannerBg = 'bg-amber-500 text-slate-900';
-        bannerTitle = '🟡 VERIFIED — RENEWAL DUE SOON';
+        bannerBg = 'bg-amber-600 text-white';
+        bannerTitle = 'Verified — renewal due soon';
         bannerSubtitle = `Valid certificate, but reverification is required within ${alert.daysLeft} days.`;
       } else if (alert.level === 'red') {
-        bannerBg = 'bg-red-600 text-white';
-        bannerTitle = '🔴 CERTIFICATE EXPIRED — NON-COMPLIANT';
-        bannerSubtitle = `This certificate expired ${Math.abs(alert.daysLeft)} days ago. Trading with an unrenewed machine violates the Legal Metrology Act!`;
+        bannerBg = 'bg-plum-dark text-white';
+        bannerTitle = 'Certificate expired — non-compliant';
+        bannerSubtitle = `This certificate expired ${Math.abs(alert.daysLeft)} days ago. Trading with an unrenewed machine violates the Legal Metrology Act.`;
       }
 
       container.innerHTML = `
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200 official-certificate">
+        <div class="glass-panel rounded-2xl shadow-xl overflow-hidden border border-slate-200 official-certificate bg-white">
           <!-- Status Banner -->
           <div class="${bannerBg} px-6 py-4">
             <h3 class="text-lg font-black tracking-wide">${bannerTitle}</h3>
-            <p class="text-xs opacity-90 mt-0.5">${bannerSubtitle}</p>
+            <p class="text-xs opacity-95 mt-0.5">${bannerSubtitle}</p>
           </div>
 
           <div class="p-6 sm:p-8 space-y-6">
@@ -228,7 +226,7 @@
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                 <div>
                   <span class="text-slate-400 block text-[10px] uppercase">Business Owner Name</span>
-                  <p class="font-extrabold text-navy text-sm sm:text-base mt-0.5">${escapeHtml(cert.ownerName)}</p>
+                  <p class="font-extrabold text-slate-900 text-sm sm:text-base mt-0.5">${escapeHtml(cert.ownerName)}</p>
                 </div>
                 <div>
                   <span class="text-slate-400 block text-[10px] uppercase">Shop / Commercial Entity</span>
@@ -250,7 +248,7 @@
                 <div class="grid grid-cols-2 gap-3">
                   <div>
                     <span class="text-slate-400 block text-[10px] uppercase">Instrument Name</span>
-                    <p class="font-bold text-navy text-sm">${escapeHtml(cert.instrumentName)}</p>
+                    <p class="font-bold text-slate-900 text-sm">${escapeHtml(cert.instrumentName)}</p>
                   </div>
                   <div>
                     <span class="text-slate-400 block text-[10px] uppercase">Category</span>
@@ -269,11 +267,11 @@
                 <div class="grid grid-cols-2 gap-3 pt-3 border-t border-slate-100">
                   <div>
                     <span class="text-slate-400 block text-[10px] uppercase">Verification Date</span>
-                    <p class="font-bold text-green-700">${formatDate(cert.verificationDate)}</p>
+                    <p class="font-bold text-emerald-700">${formatDate(cert.verificationDate)}</p>
                   </div>
                   <div>
                     <span class="text-slate-400 block text-[10px] uppercase">Validity Expiry Date</span>
-                    <p class="font-bold ${alert.level === 'red' ? 'text-red-600 font-extrabold' : 'text-navy'}">${formatDate(cert.expiryDate)}</p>
+                    <p class="font-bold ${alert.level === 'red' ? 'text-rose-600 font-extrabold' : 'text-slate-900'}">${formatDate(cert.expiryDate)}</p>
                   </div>
                 </div>
               </div>
@@ -290,7 +288,7 @@
             <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs">
               <div>
                 <span class="text-slate-400">Government Certificate Code:</span>
-                <span class="font-mono font-bold text-navy ml-1 bg-gold/15 px-2.5 py-1 rounded border border-gold/30">
+                <span class="font-mono font-bold text-plum ml-1 bg-milk-deep px-2.5 py-1 rounded border border-milk-line">
                   ${escapeHtml(cert.certificateId)}
                 </span>
               </div>
@@ -300,14 +298,14 @@
             </div>
 
             <!-- Citizen Redressal Quick Action -->
-            <div class="mt-4 pt-4 border-t border-slate-100 bg-amber-50/70 p-4 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+            <div class="mt-4 pt-4 border-t border-milk-line bg-milk-deep p-4 rounded-lg flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
               <div>
-                <p class="font-bold text-slate-800">Spot an issue with this seller or machine?</p>
+                <p class="font-semibold text-slate-800">Spot an issue with this seller or machine?</p>
                 <p class="text-slate-500">If the machine is tampered, giving short weights, or expired, report it immediately.</p>
               </div>
               <a href="complaint.html?seller=${encodeURIComponent(cert.ownerName)}&shop=${encodeURIComponent(cert.shopName)}&address=${encodeURIComponent(cert.shopAddress)}"
-                class="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition-colors shadow flex-shrink-0">
-                🚨 Report Seller / File Complaint
+                class="btn-primary px-4 py-2 rounded-lg text-xs flex-shrink-0">
+                File complaint
               </a>
             </div>
 
@@ -319,14 +317,14 @@
     function renderNotFoundCard(code, errorMsg) {
       const container = document.getElementById('verifyResultContainer');
       container.innerHTML = `
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden border-l-8 border-red-600">
-          <div class="bg-red-600 text-white px-6 py-4">
-            <h3 class="text-base font-bold">❌ Certificate Not Found or Invalid</h3>
+        <div class="glass-panel rounded-2xl shadow-xl overflow-hidden border-l-8 border-rose-600 bg-white">
+          <div class="bg-plum text-white px-6 py-4">
+            <h3 class="text-base font-bold">Certificate not found or invalid</h3>
           </div>
           <div class="p-6 sm:p-8 space-y-4 text-xs">
             <p class="text-slate-700 text-sm">
               No active or verified certificate was found in the Legal Metrology database matching code:
-              <strong class="font-mono text-red-600">${escapeHtml(code)}</strong>
+              <strong class="font-mono text-rose-600">${escapeHtml(code)}</strong>
             </p>
             <p class="text-slate-500">
               Reasons for this may include:
@@ -338,11 +336,11 @@
             </ul>
             <div class="pt-4 border-t border-slate-100 flex flex-wrap gap-3">
               <a href="complaint.html?seller=Unknown&description=${encodeURIComponent('Unregistered weighing machine detected with invalid code: ' + code)}"
-                class="bg-red-600 hover:bg-red-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs transition-colors shadow">
-                📣 Report this Seller for Unlawful Instrument
+                class="btn-primary px-5 py-2.5 rounded-lg text-xs">
+                Report this seller
               </a>
               <button type="button" onclick="document.getElementById('certCodeInput').focus()"
-                class="bg-slate-100 hover:bg-slate-200 text-navy font-semibold px-4 py-2.5 rounded-xl text-xs border border-slate-200">
+                class="btn-secondary px-4 py-2.5 rounded-xl text-xs">
                 Try Another Code
               </button>
             </div>

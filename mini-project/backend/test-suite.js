@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const BASE_URL = 'http://localhost:5000';
+const BASE_URL = process.env.TEST_BASE_URL || 'http://127.0.0.1:5000';
 
 async function request(urlPath, options = {}) {
   const res = await fetch(`${BASE_URL}${urlPath}`, options);
@@ -27,6 +27,15 @@ function createTestImage(filename) {
 async function runTests() {
   console.log('🧪 Starting LMVS End-to-End Automated Verification...\n');
 
+  let localServer = null;
+  try {
+    await fetch(`${BASE_URL}/api/health`, { signal: AbortSignal.timeout(500) });
+  } catch (_e) {
+    console.log('⚡ Server not running at port 5000. Launching internal server instance for tests...');
+    const { startServer } = require('./server');
+    localServer = await startServer();
+  }
+
   const testImg = createTestImage('temp_test_scale.png');
 
   try {
@@ -44,6 +53,36 @@ async function runTests() {
     });
     console.log('   ✅ Officer logged in:', officerAuth.user.name, `(${officerAuth.user.role})`);
     const officerToken = officerAuth.token;
+
+    // 2B. Testing Officer Registration & Validation Rule (113iom...)
+    console.log('\n2️⃣b Testing Officer Registration ID Validation (Prefix: 113iom)...');
+    try {
+      await request('/api/auth/officer-register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          idno: 'INVALID999',
+          name: 'Fake Officer',
+          password: 'SecretPassword',
+        }),
+      });
+      throw new Error('Should have rejected invalid officer ID without 113iom prefix!');
+    } catch (err) {
+      console.log('   ✅ Correctly blocked invalid Officer ID:', err.message);
+    }
+
+    const newOfficerId = `113iom${20 + Math.floor(Math.random() * 50)}`;
+    const regOfficer = await request('/api/auth/officer-register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        idno: newOfficerId,
+        name: 'Inspector Suresh Nair',
+        password: 'Officer@456',
+        phone: '011-2338-1122',
+      }),
+    });
+    console.log(`   ✅ Successfully registered new Officer with valid ID (${newOfficerId}):`, regOfficer.user.name);
 
     // 3. Business Owner Registration
     console.log('\n3️⃣ Testing Business Owner Registration...');
@@ -173,6 +212,10 @@ async function runTests() {
   } finally {
     if (fs.existsSync(testImg)) {
       fs.unlinkSync(testImg);
+    }
+    if (localServer) {
+      localServer.close();
+      console.log('🏁 Test server closed.');
     }
   }
 }

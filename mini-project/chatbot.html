@@ -10,22 +10,28 @@
 
   <style>
     :root {
-      --navy:        #0B1F3A;
-      --navy-light:  #12304F;
-      --gold:        #D4A017;
-      --gold-light:  #F0C040;
-      --accent:      #1D6FA4;
-      --accent-glow: rgba(29,111,164,.35);
-      --bg:          #0d1b2a;
-      --surface:     #112233;
-      --surface-2:   #162840;
-      --border:      rgba(212,160,23,.18);
-      --text:        #E8EFF7;
-      --text-muted:  #8BA3BB;
-      --bot-bubble:  #1a2f47;
-      --user-bubble: linear-gradient(135deg,#1D6FA4,#0e4d7a);
-      --shadow:      0 8px 32px rgba(0,0,0,.45);
-      --radius:      18px;
+      --plum:        #5C1D48;
+      --plum-light:  #7B2860;
+      --plum-dark:   #471437;
+      --milk:        #FAF6F0;
+      --milk-deep:   #F0EAE1;
+      --milk-line:   #E2D9CC;
+      --navy:        #5C1D48;
+      --navy-light:  #471437;
+      --gold:        #5C1D48;
+      --gold-light:  #7B2860;
+      --accent:      #7B2860;
+      --accent-glow: rgba(92, 29, 72, 0.25);
+      --bg:          #FAF6F0;
+      --surface:     #FFFFFF;
+      --surface-2:   #F5EFE6;
+      --border:      #E2D9CC;
+      --text:        #231820;
+      --text-muted:  #7E6E79;
+      --bot-bubble:  #FFFDF9;
+      --user-bubble: #5C1D48;
+      --shadow:      0 10px 24px rgba(40, 15, 32, 0.10);
+      --radius:      16px;
       --font:        'Inter', system-ui, sans-serif;
     }
 
@@ -40,36 +46,6 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
-    }
-
-    .bg-anim {
-      position: fixed; inset: 0; z-index: 0; overflow: hidden;
-    }
-    .bg-anim::before {
-      content: '';
-      position: absolute; inset: -50%;
-      background: radial-gradient(ellipse 60% 40% at 30% 60%, rgba(29,111,164,.18) 0%, transparent 70%),
-                  radial-gradient(ellipse 50% 35% at 75% 25%, rgba(212,160,23,.10) 0%, transparent 70%);
-      animation: drift 12s ease-in-out infinite alternate;
-    }
-    @keyframes drift {
-      from { transform: translate(0,0) scale(1); }
-      to   { transform: translate(3%,2%) scale(1.04); }
-    }
-
-    .particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-    .particle {
-      position: absolute;
-      border-radius: 50%;
-      background: var(--gold);
-      opacity: 0;
-      animation: float-up linear infinite;
-    }
-    @keyframes float-up {
-      0%   { opacity: 0;    transform: translateY(0) scale(0); }
-      10%  { opacity: .45; }
-      90%  { opacity: .15; }
-      100% { opacity: 0;    transform: translateY(-90vh) scale(1.5); }
     }
 
     .chat-wrapper {
@@ -88,16 +64,15 @@
     .chat-header {
       display: flex; align-items: center; gap: 12px;
       padding: 16px 20px;
-      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-      border-bottom: 1px solid var(--border);
+      background: linear-gradient(135deg, var(--plum) 0%, var(--plum-dark) 100%);
+      border-bottom: 1px solid rgba(255,255,255,.12);
       flex-shrink: 0;
     }
     .header-avatar {
-      width: 44px; height: 44px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--gold), var(--accent));
+      width: 36px; height: 36px; border-radius: 8px;
+      background: rgba(255,255,255,.18);
       display: flex; align-items: center; justify-content: center;
-      font-size: 22px;
-      box-shadow: 0 0 0 3px rgba(212,160,23,.25);
+      font-size: 12px; font-weight: 700; color: #fff;
       flex-shrink: 0;
       position: relative;
     }
@@ -105,7 +80,7 @@
       position: absolute; bottom: 2px; right: 2px;
       width: 10px; height: 10px; border-radius: 50%;
       background: #22c55e;
-      border: 2px solid var(--navy);
+      border: 2px solid var(--plum);
       box-shadow: 0 0 6px #22c55e;
       animation: pulse-dot 2s ease-in-out infinite;
     }
@@ -114,24 +89,24 @@
       50%      { box-shadow: 0 0 14px #22c55e; }
     }
     .header-info h2 {
-      font-size: 15px; font-weight: 700; color: var(--text);
+      font-size: 15px; font-weight: 700; color: #fff;
       letter-spacing: .3px;
     }
     .header-info p {
-      font-size: 11px; color: var(--gold-light); font-weight: 500;
+      font-size: 11px; color: rgba(255,255,255,.85); font-weight: 500;
       margin-top: 2px;
     }
     .header-actions { margin-left: auto; display: flex; gap: 8px; }
     .hdr-btn {
-      width: 32px; height: 32px; border-radius: 8px;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,.05);
-      color: var(--text-muted);
-      cursor: pointer; font-size: 15px;
+      padding: 4px 10px; border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.2);
+      background: rgba(255,255,255,.1);
+      color: #fff;
+      cursor: pointer; font-size: 12px; font-weight: 600;
       display: flex; align-items: center; justify-content: center;
       transition: all .2s;
     }
-    .hdr-btn:hover { background: rgba(255,255,255,.1); color: var(--text); transform: scale(1.08); }
+    .hdr-btn:hover { background: rgba(255,255,255,.2); color: #fff; transform: scale(1.04); }
 
     .quick-chips {
       display: flex; gap: 8px; flex-wrap: wrap;
@@ -143,14 +118,14 @@
     .chip {
       padding: 5px 12px; border-radius: 20px;
       border: 1px solid var(--border);
-      background: rgba(29,111,164,.15);
-      color: var(--gold-light); font-size: 11.5px; font-weight: 500;
+      background: #FFFFFF;
+      color: var(--plum); font-size: 11.5px; font-weight: 600;
       cursor: pointer; white-space: nowrap;
       transition: all .2s;
     }
     .chip:hover {
-      background: rgba(212,160,23,.2);
-      border-color: var(--gold);
+      background: var(--milk-deep);
+      border-color: var(--plum);
       transform: translateY(-1px);
     }
 
@@ -179,8 +154,8 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 14px;
     }
-    .msg-row.bot  .msg-avatar { background: linear-gradient(135deg,var(--gold),var(--accent)); }
-    .msg-row.user .msg-avatar { background: linear-gradient(135deg,#1D6FA4,#0a3a5e); }
+    .msg-row.bot  .msg-avatar { background: var(--milk-deep, #F0EAE1); color: var(--plum); font-size: 10px; font-weight: 700; border: 1px solid var(--border); }
+    .msg-row.user .msg-avatar { background: var(--plum); color: #fff; font-size: 10px; font-weight: 700; }
 
     .bubble {
       max-width: 78%; padding: 11px 15px;
@@ -190,7 +165,7 @@
     }
     .msg-row.bot  .bubble {
       background: var(--bot-bubble);
-      border: 1px solid rgba(255,255,255,.07);
+      border: 1px solid var(--border);
       border-bottom-left-radius: 4px;
       color: var(--text);
     }
@@ -203,8 +178,8 @@
       display: block; font-size: 10px; color: var(--text-muted);
       margin-top: 5px; text-align: right;
     }
-    .bubble strong { color: var(--gold-light); }
-    .bubble a { color: var(--gold-light); }
+    .bubble strong { color: var(--plum); }
+    .bubble a { color: var(--plum); }
     .bubble ul { padding-left: 16px; margin-top: 4px; }
     .bubble ul li { margin-bottom: 3px; }
 
@@ -212,14 +187,14 @@
       display: none; align-items: center; gap: 5px;
       padding: 12px 15px;
       background: var(--bot-bubble);
-      border: 1px solid rgba(255,255,255,.07);
+      border: 1px solid var(--border);
       border-radius: 16px; border-bottom-left-radius: 4px;
       max-width: 70px;
     }
     .typing-indicator.active { display: flex; }
     .dot {
       width: 7px; height: 7px; border-radius: 50%;
-      background: var(--gold); opacity: .4;
+      background: var(--plum); opacity: .4;
       animation: bounce 1.2s ease-in-out infinite;
     }
     .dot:nth-child(2) { animation-delay: .2s; }
@@ -232,14 +207,14 @@
     .input-bar {
       display: flex; align-items: center; gap: 10px;
       padding: 14px 16px;
-      background: var(--navy);
-      border-top: 1px solid var(--border);
+      background: var(--plum);
+      border-top: 1px solid rgba(255,255,255,.12);
       flex-shrink: 0;
     }
     #user-input {
-      flex: 1; border: 1px solid var(--border);
-      background: rgba(255,255,255,.06);
-      color: var(--text);
+      flex: 1; border: 1px solid rgba(255,255,255,.25);
+      background: rgba(255,255,255,.14);
+      color: #fff;
       border-radius: 12px; padding: 10px 15px;
       font-size: 13.5px; font-family: var(--font);
       outline: none; resize: none;
@@ -247,39 +222,35 @@
       max-height: 100px; overflow-y: auto;
       line-height: 1.5;
     }
-    #user-input::placeholder { color: var(--text-muted); }
+    #user-input::placeholder { color: rgba(255,255,255,.7); }
     #user-input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-glow);
+      border-color: #FFFFFF;
+      box-shadow: 0 0 0 3px rgba(255,255,255,.25);
     }
     #send-btn {
-      width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0;
-      background: linear-gradient(135deg,var(--gold),#b8860b);
-      border: none; cursor: pointer;
+      width: 42px; height: 42px; border-radius: 10px; flex-shrink: 0;
+      background: rgba(255,255,255,.2);
+      border: 1px solid rgba(255,255,255,.3); cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      transition: all .2s; box-shadow: 0 3px 12px rgba(212,160,23,.35);
+      transition: background 0.15s ease;
     }
-    #send-btn:hover { transform: scale(1.08); box-shadow: 0 5px 18px rgba(212,160,23,.55); }
-    #send-btn:active { transform: scale(.95); }
-    #send-btn svg { width: 18px; height: 18px; fill: #0B1F3A; }
+    #send-btn:hover { background: rgba(255,255,255,.3); }
+    #send-btn svg { width: 18px; height: 18px; fill: #fff; }
 
     .footer-note {
-      text-align: center; font-size: 10.5px; color: var(--text-muted);
+      text-align: center; font-size: 10.5px; color: rgba(255,255,255,.75);
       padding: 6px 12px 10px;
-      background: var(--navy);
+      background: var(--plum);
     }
   </style>
 </head>
 <body>
 
-<div class="bg-anim"></div>
-<div class="particles" id="particles"></div>
-
 <div class="chat-wrapper" id="chat-wrapper">
 
   <div class="chat-header">
     <div class="header-avatar">
-      &#9878;
+      MB
       <span class="status-dot"></span>
     </div>
     <div class="header-info">
@@ -287,23 +258,24 @@
       <p>Legal Metrology Assistant &middot; Online</p>
     </div>
     <div class="header-actions">
-      <button class="hdr-btn" id="clear-btn" title="Clear chat">&#128465;</button>
+      <a href="index.html" class="hdr-btn" style="text-decoration:none; display:flex; align-items:center; gap:4px;">&larr; Home</a>
+      <button class="hdr-btn" id="clear-btn" title="Clear chat">Clear</button>
     </div>
   </div>
 
   <div class="quick-chips" id="chips">
-    <span class="chip" data-q="How do I verify a certificate?">&#128269; Verify Certificate</span>
-    <span class="chip" data-q="How to file a complaint?">&#128203; File Complaint</span>
-    <span class="chip" data-q="What is legal metrology?">&#8505; About</span>
-    <span class="chip" data-q="I need officer contact">&#128222; Contact Officer</span>
-    <span class="chip" data-q="What documents are required?">&#128196; Documents</span>
+    <span class="chip" data-q="How do I verify a certificate?">Verify certificate</span>
+    <span class="chip" data-q="How to file a complaint?">File complaint</span>
+    <span class="chip" data-q="What is legal metrology?">About</span>
+    <span class="chip" data-q="I need officer contact">Contact officer</span>
+    <span class="chip" data-q="What documents are required?">Documents</span>
   </div>
 
   <div class="messages" id="messages"></div>
 
   <div style="padding: 0 16px 6px; display:none;" id="typing-row">
     <div class="msg-row bot" style="gap:10px;align-items:flex-end;">
-      <div class="msg-avatar">&#9878;</div>
+      <div class="msg-avatar">MB</div>
       <div class="typing-indicator active" id="typing-indicator">
         <div class="dot"></div>
         <div class="dot"></div>
@@ -321,7 +293,7 @@
     </button>
   </div>
 
-  <div class="footer-note">&#127963; Government of India &middot; Legal Metrology Division &middot; Responses are informational only</div>
+  <div class="footer-note">Government of India · Legal Metrology Division · Informational only</div>
 </div>
 
 <script>
@@ -480,7 +452,7 @@ function appendMsg(who, html) {
 
   var avatar = document.createElement('div');
   avatar.className = 'msg-avatar';
-  avatar.textContent = who === 'bot' ? '⚖️' : '👤';
+  avatar.textContent = who === 'bot' ? 'MB' : 'You';
 
   var bubble = document.createElement('div');
   bubble.className = 'bubble';
@@ -538,35 +510,14 @@ document.querySelectorAll('.chip').forEach(function(chip) {
 
 clearBtn.addEventListener('click', function() {
   messagesEl.innerHTML = '';
-  appendMsg('bot', "&#128172; Chat cleared! How can I assist you with Legal Metrology today?");
+  appendMsg('bot', "Chat cleared. How can I assist you with Legal Metrology today?");
 });
 
-/* Welcome message */
 showTyping(1000).then(function() {
   appendMsg('bot',
-    "&#128075; Welcome to <strong>MetroBot</strong>! I'm your Legal Metrology assistant. I can help you with:<ul><li>&#9989; Certificate verification</li><li>&#128203; Filing complaints</li><li>&#9878; Regulations &amp; penalties</li><li>&#128196; Required documents</li></ul>Use the quick buttons above or just type your question!"
+    "Welcome to <strong>MetroBot</strong>. I can help with:<ul><li>Certificate verification</li><li>Filing complaints</li><li>Regulations and penalties</li><li>Required documents</li></ul>Use the buttons above or type a question."
   );
 });
-
-/* ════════════════════════════════════
-   PARTICLES
-   ════════════════════════════════════ */
-(function() {
-  var container = document.getElementById('particles');
-  for (var i = 0; i < 22; i++) {
-    var p = document.createElement('div');
-    p.className = 'particle';
-    var size = 2 + Math.random() * 4;
-    p.style.cssText =
-      'width:' + size + 'px;height:' + size + 'px;' +
-      'left:' + (Math.random() * 100) + 'vw;' +
-      'bottom:' + (-10 + Math.random() * 5) + 'vh;' +
-      'animation-duration:' + (8 + Math.random() * 14) + 's;' +
-      'animation-delay:' + (Math.random() * 12) + 's;' +
-      'opacity:0;';
-    container.appendChild(p);
-  }
-})();
 </script>
 </body>
 </html>

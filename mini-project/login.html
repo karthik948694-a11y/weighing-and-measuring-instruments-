@@ -3,263 +3,576 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login & Registration | Legal Metrology Verification System</title>
+  <title>Login &amp; Registration | Legal Metrology Verification System</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="js/tailwind-config.js"></script>
-  <link rel="stylesheet" href="css/style.css">
+  <script src="tailwind-config.js"></script>
+  <link rel="stylesheet" href="style.css">
 </head>
-<body class="min-h-screen flex flex-col bg-slate-50 text-slate-800">
+<body class="min-h-screen flex flex-col bg-calibration-pattern text-slate-900 transition-colors duration-300">
 
   <div id="navbar-container"></div>
 
-  <main class="flex-1 py-12 px-4 flex items-center justify-center">
-    <div class="w-full max-w-lg">
+  <main class="flex-1 py-10 px-4 flex items-center justify-center">
+    <div class="w-full max-w-xl">
 
-      <!-- Header Card -->
-      <div class="text-center mb-8">
-        <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-navy text-gold text-3xl shadow-md mb-3">
-          ⚖️
+      <!-- MACHINE HOLDER (SHOPKEEPER) AUTH BOX -->
+      <div class="glass-panel rounded-2xl overflow-hidden bg-white shadow-xl border border-milk-line">
+        
+        <div class="bg-milk-deep px-6 py-4 border-b border-milk-line">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-plum"></span>
+              <span class="text-xs font-bold uppercase tracking-wider text-plum">Machine Holder Portal</span>
+            </div>
+            <span class="text-[11px] bg-plum/10 text-plum font-bold px-2.5 py-0.5 rounded-full border border-plum/20">
+              Commercial Scalekeeper Login
+            </span>
+          </div>
+          <p class="text-xs text-slate-600 mt-1">
+            Shopkeepers, traders, and commercial scale owners: Sign in or register to upload weighing machine details &amp; calibration proof.
+          </p>
         </div>
-        <h1 class="text-2xl sm:text-3xl font-extrabold text-navy">Legal Metrology Portal</h1>
-        <p class="text-slate-500 text-xs sm:text-sm mt-1">
-          Government Weighing &amp; Measuring Instrument Management System
-        </p>
-      </div>
 
-      <!-- Main Auth Box -->
-      <div class="bg-white rounded-2xl shadow-xl border border-slate-200/80 overflow-hidden">
-        <!-- Auth Tabs -->
-        <div class="flex border-b border-slate-200 bg-slate-50 text-sm font-semibold">
+        <div class="flex border-b border-milk-line bg-milk-subtle text-sm font-semibold">
           <button type="button" id="tabLogin"
-            class="flex-1 py-3.5 text-center text-navy border-b-2 border-gold bg-white transition-all">
-            Sign In
+            class="flex-1 py-3.5 text-center text-plum border-b-2 border-plum bg-white transition-all font-bold">
+            Sign In (Machine Holder)
           </button>
           <button type="button" id="tabRegister"
-            class="flex-1 py-3.5 text-center text-slate-500 hover:text-navy border-b-2 border-transparent transition-all">
-            Register Business / Seller
+            class="flex-1 py-3.5 text-center text-slate-500 hover:text-plum border-b-2 border-transparent transition-all font-semibold">
+            Register New Machine Holder
           </button>
         </div>
 
         <div class="p-6 sm:p-8">
-          <!-- LOGIN FORM -->
+          
+          <!-- 1. MACHINE HOLDER LOGIN FORM -->
           <form id="loginForm" class="space-y-4">
             <div>
-              <label for="loginEmail" class="block text-xs font-bold text-navy uppercase tracking-wider mb-1">
-                Official Email Address
-              </label>
-              <input type="email" id="loginEmail" required placeholder="e.g. owner@store.com or officer@lmvs.gov"
-                class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold">
+              <div class="flex justify-between items-center mb-1">
+                <label for="loginIdentifier" class="block text-xs font-bold text-slate-800 uppercase tracking-wider">
+                  Aadhaar No. / Mobile / Email *
+                </label>
+                <span class="text-[10px] text-slate-500 font-medium">12-digit Aadhaar / 10-digit Phone</span>
+              </div>
+              <input type="text" id="loginIdentifier" required placeholder="Enter Aadhaar (e.g. 5432 1098 7654) or Mobile / Email"
+                class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-plum focus:border-plum bg-white text-slate-900 transition-colors">
             </div>
 
             <div>
               <div class="flex justify-between items-center mb-1">
-                <label for="loginPassword" class="block text-xs font-bold text-navy uppercase tracking-wider">
-                  Password
+                <label for="loginPassword" class="block text-xs font-bold text-slate-800 uppercase tracking-wider">
+                  Password / PIN *
                 </label>
               </div>
-              <input type="password" id="loginPassword" required placeholder="Enter password (min 6 characters)"
-                class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold">
+              <input type="password" id="loginPassword" required placeholder="Enter your secret password"
+                class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-plum focus:border-plum bg-white text-slate-900 transition-colors">
             </div>
 
             <button type="submit" id="loginSubmitBtn"
-              class="w-full bg-navy hover:bg-navy-light text-gold font-bold py-3 rounded-xl transition-all shadow-md hover:shadow-lg text-sm mt-2 flex items-center justify-center gap-2">
-              <span>Sign In to Portal &rarr;</span>
+              class="btn-primary w-full py-3.5 rounded-xl text-sm mt-3 flex items-center justify-center gap-2 shadow-lg">
+              <span>Sign In as Machine Holder &rarr;</span>
             </button>
 
-            <!-- Quick Demo Credential Buttons -->
-            <div class="pt-5 border-t border-slate-100 mt-5">
-              <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider text-center mb-2.5">
-                Quick Demo Access (Click to Fill &amp; Test)
+            <!-- Quick Demo Credential Access -->
+            <div class="pt-4 border-t border-slate-100 mt-4">
+              <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center mb-2">
+                Quick Demo Access (Machine Holder)
               </p>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <button type="button" id="demoOfficerBtn"
-                  class="bg-slate-100 hover:bg-slate-200 text-navy font-semibold px-3 py-2 rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5 border border-slate-200">
-                  <span>👮 Fill Officer Login</span>
-                </button>
+              <div class="flex justify-center">
                 <button type="button" id="demoOwnerBtn"
-                  class="bg-slate-100 hover:bg-slate-200 text-navy font-semibold px-3 py-2 rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5 border border-slate-200">
-                  <span>🏭 Fill Demo Seller</span>
+                  class="bg-milk-deep hover:bg-milk-line text-plum font-bold px-4 py-2 rounded-xl text-xs transition-colors flex items-center justify-center gap-1.5 border border-plum/20">
+                  <span>Fill Demo Machine Holder (Rajesh Sharma)</span>
                 </button>
               </div>
-              <p class="text-[11px] text-slate-400 text-center mt-2">
-                Default Officer: <code class="text-navy font-mono">officer@lmvs.gov</code> / <code class="text-navy font-mono">Officer@123</code>
-              </p>
+              <div class="p-2 bg-milk-deep/50 rounded-xl border border-milk-line text-[11px] text-slate-600 mt-2 text-center">
+                Aadhaar: <code class="font-mono font-semibold text-slate-800">5432 1098 7654</code> · Password: <code class="font-mono font-semibold text-slate-800">Owner@123</code>
+              </div>
             </div>
           </form>
 
-          <!-- REGISTRATION FORM -->
+          <!-- 2. NEW MACHINE HOLDER REGISTRATION FORM -->
           <form id="registerForm" class="space-y-4 hidden">
+            <div class="p-3 bg-milk-deep/70 rounded-xl border border-plum/20 text-xs text-slate-700 leading-relaxed mb-3">
+              <span class="font-bold text-plum">Mandatory Statutory Details:</span> In accordance with Legal Metrology Regulations, machine holders must provide their legal Name, 12-digit Aadhaar Number, and Contact Details.
+            </div>
+
             <div>
-              <label for="regName" class="block text-xs font-bold text-navy uppercase tracking-wider mb-1">
-                Owner / Authorized Person Name *
+              <label for="regName" class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1">
+                Full Name of Machine Holder (as on Aadhaar Card) *
               </label>
               <input type="text" id="regName" required placeholder="e.g. Ramesh Kumar"
-                class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold">
+                class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-plum focus:border-plum bg-white text-slate-900">
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label for="regEmail" class="block text-xs font-bold text-navy uppercase tracking-wider mb-1">
-                  Email Address *
-                </label>
-                <input type="email" id="regEmail" required placeholder="ramesh@retail.com"
-                  class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold">
+                <div class="flex justify-between items-center mb-1">
+                  <label for="regAadhaarNo" class="block text-xs font-bold text-slate-800 uppercase tracking-wider">
+                    Aadhaar Number *
+                  </label>
+                  <span class="text-[10px] text-plum font-semibold">12 Digits</span>
+                </div>
+                <input type="text" id="regAadhaarNo" required maxlength="14" placeholder="XXXX-XXXX-XXXX"
+                  class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-plum focus:border-plum bg-white text-slate-900">
               </div>
+
               <div>
-                <label for="regPhone" class="block text-xs font-bold text-navy uppercase tracking-wider mb-1">
-                  Phone Number *
+                <label for="regPhone" class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1">
+                  Mobile Phone Number *
                 </label>
                 <input type="tel" id="regPhone" required placeholder="+91 98765 43210"
-                  class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold">
+                  class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-plum focus:border-plum bg-white text-slate-900">
               </div>
             </div>
 
             <div>
-              <label for="regShopName" class="block text-xs font-bold text-navy uppercase tracking-wider mb-1">
-                Business / Enterprise / Shop Name *
+              <label for="regShopName" class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1">
+                Shop / Enterprise / Business Establishment Name *
               </label>
-              <input type="text" id="regShopName" required placeholder="e.g. Ramesh Provisions & Weighing Center"
-                class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold">
+              <input type="text" id="regShopName" required placeholder="e.g. Ramesh Provisions &amp; Weighing Mart"
+                class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-plum focus:border-plum bg-white text-slate-900">
             </div>
 
             <div>
-              <label for="regShopAddress" class="block text-xs font-bold text-navy uppercase tracking-wider mb-1">
-                Shop / Establishment Address *
+              <label for="regShopAddress" class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1">
+                Shop Location / Commercial Address *
               </label>
-              <textarea id="regShopAddress" rows="2" required placeholder="Shop #12, Market Road, Ward 4..."
-                class="w-full border border-slate-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold"></textarea>
+              <textarea id="regShopAddress" rows="2" required placeholder="Shop #12, Market Main Road, Ward 4..."
+                class="w-full border border-slate-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-plum focus:border-plum bg-white text-slate-900"></textarea>
             </div>
 
-            <div>
-              <label for="regPassword" class="block text-xs font-bold text-navy uppercase tracking-wider mb-1">
-                Password * (minimum 6 characters)
-              </label>
-              <input type="password" id="regPassword" required minlength="6" placeholder="Choose a secure password"
-                class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label for="regEmail" class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1">
+                  Email Address (Optional)
+                </label>
+                <input type="email" id="regEmail" placeholder="ramesh@retail.com"
+                  class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-plum focus:border-plum bg-white text-slate-900">
+              </div>
+
+              <div>
+                <label for="regPassword" class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1">
+                  Password / PIN * (min 6 chars)
+                </label>
+                <input type="password" id="regPassword" required minlength="6" placeholder="Choose secure password"
+                  class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-plum focus:border-plum bg-white text-slate-900">
+              </div>
             </div>
 
             <button type="submit" id="regSubmitBtn"
-              class="w-full bg-gold hover:bg-gold-light text-navy font-bold py-3 rounded-xl transition-all shadow-md text-sm mt-2 flex items-center justify-center gap-2">
-              <span>Create Business Account &rarr;</span>
+              class="btn-brass w-full py-3.5 rounded-xl text-sm mt-3 flex items-center justify-center gap-2 shadow-lg">
+              <span>Register Machine Holder &amp; Upload Scale Details &rarr;</span>
             </button>
           </form>
+
+          <!-- 3. DOWN SIDE SECTION: LEGAL METROLOGY OFFICER ACCESS & REGISTRATION -->
+          <div class="mt-8 pt-6 border-t-2 border-dashed border-slate-200">
+            <div class="p-5 rounded-2xl bg-gradient-to-br from-slate-50 via-milk-subtle to-slate-100 border border-slate-300 shadow-sm text-center">
+              <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-plum/15 text-plum text-xs font-black uppercase tracking-wider mb-2">
+                <span>⚖️ Authorized Government Enforcement</span>
+              </div>
+              <h3 class="text-sm font-black text-slate-900">Legal Metrology Officer Verification Portal</h3>
+              <p class="text-xs text-slate-600 mt-1 max-w-md mx-auto leading-relaxed">
+                The Officer Dashboard is strictly restricted to authorized Legal Metrology Officers. Register or sign in with your official Officer ID (<code class="font-bold text-plum">113iom20</code>, <code class="font-bold text-plum">113iom21...</code>) and Name below.
+              </p>
+              
+              <div class="mt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <button type="button" id="openOfficerModalBtn"
+                  class="w-full sm:w-auto px-6 py-3 rounded-xl bg-plum hover:bg-plum-deep text-milk font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer border border-plum/30 hover:scale-105 active:scale-95">
+                  <span>⚖️ Officer Register / Enter ID &rarr;</span>
+                </button>
+              </div>
+
+              <div class="mt-3 inline-flex items-center gap-2 text-[11px] text-slate-500 font-medium bg-white/70 px-3 py-1 rounded-full border border-slate-200">
+                <span>🔐 Validation Rule:</span>
+                <span>ID must start with <strong class="font-mono text-plum">113iom</strong> (e.g. 113iom20, 113iom21)</span>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
 
-      <!-- Public Links -->
+      <!-- Public Navigation Links -->
       <div class="mt-6 text-center text-xs text-slate-500 space-x-3">
-        <a href="verify.html" class="hover:text-navy underline">🔍 Public Certificate Verification</a>
-        <span>&bull;</span>
-        <a href="complaint.html" class="hover:text-red-600 underline">📣 Report a Violation</a>
+        <a href="index.html" class="hover:text-plum underline font-semibold">Home</a>
+        <span>·</span>
+        <a href="complaint.html" class="hover:text-plum underline font-semibold">File a Complaint</a>
+        <span>·</span>
+        <a href="verify.html" class="hover:text-plum underline font-semibold">Verify Certificate</a>
+        <span>·</span>
+        <a href="chatbot.html" class="hover:text-plum underline font-semibold">Help (Chatbot)</a>
       </div>
 
     </div>
   </main>
 
+  <!-- OFFICER REGISTER & VERIFICATION MODAL -->
+  <div id="officerModal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="glass-panel w-full max-w-md rounded-2xl bg-white shadow-2xl border border-slate-200 overflow-hidden animate-fadeIn">
+      
+      <!-- Modal Header -->
+      <div class="bg-gradient-to-r from-plum-deep to-plum text-milk px-6 py-4 flex items-center justify-between border-b border-white/10">
+        <div class="flex items-center gap-2.5">
+          <span class="w-9 h-9 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center text-xl">⚖️</span>
+          <div>
+            <h3 class="text-sm sm:text-base font-extrabold text-white">Officer Registration &amp; Verification</h3>
+            <p class="text-[11px] text-white/80">Department of Legal Metrology &bull; Govt of India</p>
+          </div>
+        </div>
+        <button type="button" id="closeOfficerModalBtn" class="text-white/70 hover:text-white text-2xl font-bold p-1 cursor-pointer leading-none">&times;</button>
+      </div>
+
+      <!-- Modal Form -->
+      <form id="officerRegisterForm" class="p-6 space-y-4">
+        <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 leading-relaxed">
+          <span class="font-bold">Mandatory ID Requirement:</span> Access is strictly verified. Your Official ID Number must start with the authorized government prefix <code class="font-mono font-bold text-plum bg-white px-1.5 py-0.5 rounded border border-amber-300">113iom</code> (e.g. <strong>113iom20</strong>, <strong>113iom21</strong>, etc.).
+        </div>
+
+        <!-- Officer ID Number (idno) -->
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <label for="officerIdInput" class="block text-xs font-bold text-slate-800 uppercase tracking-wider">
+              Officer ID Number (idno) *
+            </label>
+            <span id="officerIdStatus" class="text-[11px] font-bold"></span>
+          </div>
+          <input type="text" id="officerIdInput" required placeholder="e.g. 113iom20"
+            class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm font-mono font-semibold focus:outline-none focus:ring-2 focus:ring-plum focus:border-plum bg-white text-slate-900 transition-all">
+          <p id="officerIdError" class="text-[11px] text-rose-600 font-semibold mt-1 hidden"></p>
+        </div>
+
+        <!-- Officer Full Name -->
+        <div>
+          <label for="officerNameInput" class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1">
+            Officer Full Name &amp; Designation *
+          </label>
+          <input type="text" id="officerNameInput" required placeholder="e.g. Inspector K. Sharma"
+            class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-plum focus:border-plum bg-white text-slate-900">
+        </div>
+
+        <!-- Officer Password / Security PIN -->
+        <div>
+          <label for="officerPasswordInput" class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1">
+            Password / Security PIN *
+          </label>
+          <input type="password" id="officerPasswordInput" required placeholder="Enter or set your password"
+            class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-plum focus:border-plum bg-white text-slate-900">
+        </div>
+
+        <!-- Optional Contact Details -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="officerPhoneInput" class="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+              Contact / Ext (Opt)
+            </label>
+            <input type="text" id="officerPhoneInput" placeholder="011-2338-0000"
+              class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-plum bg-white text-slate-900">
+          </div>
+          <div>
+            <label for="officerEmailInput" class="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+              Govt Email (Opt)
+            </label>
+            <input type="email" id="officerEmailInput" placeholder="officer@lmvs.gov"
+              class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-plum bg-white text-slate-900">
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="submitOfficerBtn"
+          class="w-full py-3.5 rounded-xl bg-gradient-to-r from-plum-deep via-plum to-plum-light hover:brightness-110 text-white font-black text-sm shadow-lg flex items-center justify-center gap-2 transition-all mt-4 cursor-pointer">
+          <span>Verify ID &amp; Access Officer Dashboard &rarr;</span>
+        </button>
+
+        <div class="p-3 bg-milk-deep/50 rounded-xl border border-milk-line text-[11px] text-slate-600 text-center">
+          <span>Demo Officer: </span>
+          <button type="button" id="fillDemoOfficerInModalBtn" class="text-plum font-bold hover:underline">
+            Use ID: 113iom20 | PIN: Officer@123
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div id="footer-container"></div>
 
-  <script src="js/script.js"></script>
+  <script src="script.js"></script>
   <script>
-    initNavbar({ activePage: 'login' });
-    initFooter();
+    document.addEventListener('DOMContentLoaded', () => {
+      initLocalStorageDatabase();
+      initNavbar({ activePage: 'owner' });
+      
+      const footerContainer = document.getElementById('footer-container');
+      if (footerContainer && typeof renderFooter === 'function') {
+        footerContainer.innerHTML = renderFooter();
+      }
 
-    // Tab switching
-    const tabLogin = document.getElementById('tabLogin');
-    const tabRegister = document.getElementById('tabRegister');
-    const loginForm = document.getElementById('loginForm');
-    const registerForm = document.getElementById('registerForm');
+      // Tab switching
+      const tabLogin = document.getElementById('tabLogin');
+      const tabRegister = document.getElementById('tabRegister');
+      const loginForm = document.getElementById('loginForm');
+      const registerForm = document.getElementById('registerForm');
 
-    tabLogin.addEventListener('click', () => {
-      tabLogin.className = 'flex-1 py-3.5 text-center text-navy border-b-2 border-gold bg-white transition-all';
-      tabRegister.className = 'flex-1 py-3.5 text-center text-slate-500 hover:text-navy border-b-2 border-transparent transition-all';
-      loginForm.classList.remove('hidden');
-      registerForm.classList.add('hidden');
-    });
+      function showLoginTab() {
+        tabLogin.className = 'flex-1 py-3.5 text-center text-plum border-b-2 border-plum bg-white transition-all font-bold';
+        tabRegister.className = 'flex-1 py-3.5 text-center text-slate-500 hover:text-plum border-b-2 border-transparent transition-all font-semibold';
+        loginForm.classList.remove('hidden');
+        registerForm.classList.add('hidden');
+      }
 
-    tabRegister.addEventListener('click', () => {
-      tabRegister.className = 'flex-1 py-3.5 text-center text-navy border-b-2 border-gold bg-white transition-all';
-      tabLogin.className = 'flex-1 py-3.5 text-center text-slate-500 hover:text-navy border-b-2 border-transparent transition-all';
-      registerForm.classList.remove('hidden');
-      loginForm.classList.add('hidden');
-    });
+      function showRegisterTab() {
+        tabRegister.className = 'flex-1 py-3.5 text-center text-plum border-b-2 border-plum bg-white transition-all font-bold';
+        tabLogin.className = 'flex-1 py-3.5 text-center text-slate-500 hover:text-plum border-b-2 border-transparent transition-all font-semibold';
+        registerForm.classList.remove('hidden');
+        loginForm.classList.add('hidden');
+      }
 
-    // Quick fill demo accounts
-    document.getElementById('demoOfficerBtn').addEventListener('click', () => {
-      document.getElementById('loginEmail').value = 'officer@lmvs.gov';
-      document.getElementById('loginPassword').value = 'Officer@123';
-      showToast('Prefilled Legal Metrology Officer credentials', 'info');
-    });
+      tabLogin.addEventListener('click', showLoginTab);
+      tabRegister.addEventListener('click', showRegisterTab);
 
-    document.getElementById('demoOwnerBtn').addEventListener('click', () => {
-      document.getElementById('loginEmail').value = 'owner@example.com';
-      document.getElementById('loginPassword').value = 'Owner@123';
-      showToast('Prefilled Demo Seller credentials', 'info');
-    });
+      // Check URL parameters (e.g. ?role=officer or ?tab=register)
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('tab') === 'register') {
+        showRegisterTab();
+      }
 
-    // Handle Login Submit
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('loginEmail').value.trim();
-      const password = document.getElementById('loginPassword').value;
-      const btn = document.getElementById('loginSubmitBtn');
+      // Officer Modal Controls
+      const officerModal = document.getElementById('officerModal');
+      const openOfficerModalBtn = document.getElementById('openOfficerModalBtn');
+      const closeOfficerModalBtn = document.getElementById('closeOfficerModalBtn');
+      const officerIdInput = document.getElementById('officerIdInput');
+      const officerNameInput = document.getElementById('officerNameInput');
+      const officerPasswordInput = document.getElementById('officerPasswordInput');
+      const officerPhoneInput = document.getElementById('officerPhoneInput');
+      const officerEmailInput = document.getElementById('officerEmailInput');
+      const officerIdStatus = document.getElementById('officerIdStatus');
+      const officerIdError = document.getElementById('officerIdError');
+      const officerRegisterForm = document.getElementById('officerRegisterForm');
 
-      btn.disabled = true;
-      btn.innerHTML = '<span class="animate-spin">⏳</span> Signing in...';
+      function openOfficerModal() {
+        officerModal.classList.remove('hidden');
+        officerIdInput.focus();
+      }
 
-      try {
-        const data = await api('/api/auth/login', {
-          method: 'POST',
-          body: { email, password },
+      function closeOfficerModal() {
+        officerModal.classList.add('hidden');
+      }
+
+      if (openOfficerModalBtn) {
+        openOfficerModalBtn.addEventListener('click', openOfficerModal);
+      }
+      if (closeOfficerModalBtn) {
+        closeOfficerModalBtn.addEventListener('click', closeOfficerModal);
+      }
+
+      // If user came with ?role=officer, auto-open the officer modal
+      if (params.get('role') === 'officer') {
+        openOfficerModal();
+        showToast('Officer Dashboard requires ID starting with 113iom (e.g. 113iom20)', 'info');
+      }
+
+      // Live validation on Officer ID input
+      function validateOfficerIdPrefix(val) {
+        const clean = (val || '').trim().toLowerCase();
+        if (!clean) {
+          officerIdStatus.textContent = '';
+          officerIdError.classList.add('hidden');
+          officerIdInput.classList.remove('border-rose-500', 'border-emerald-500', 'ring-2', 'ring-rose-200');
+          return false;
+        }
+
+        if (clean.startsWith('113iom')) {
+          officerIdStatus.textContent = '✓ Valid Prefix (113iom)';
+          officerIdStatus.className = 'text-[11px] font-bold text-emerald-600';
+          officerIdError.classList.add('hidden');
+          officerIdInput.classList.remove('border-rose-500', 'ring-rose-200');
+          officerIdInput.classList.add('border-emerald-500');
+          return true;
+        } else {
+          officerIdStatus.textContent = '✗ Invalid Prefix';
+          officerIdStatus.className = 'text-[11px] font-bold text-rose-600';
+          officerIdError.textContent = "ID must start with '113iom' (e.g. 113iom20, 113iom21...)";
+          officerIdError.classList.remove('hidden');
+          officerIdInput.classList.add('border-rose-500', 'ring-2', 'ring-rose-200');
+          officerIdInput.classList.remove('border-emerald-500');
+          return false;
+        }
+      }
+
+      officerIdInput.addEventListener('input', (e) => {
+        validateOfficerIdPrefix(e.target.value);
+      });
+
+      // Quick fill demo officer inside modal
+      const fillDemoOfficerInModalBtn = document.getElementById('fillDemoOfficerInModalBtn');
+      if (fillDemoOfficerInModalBtn) {
+        fillDemoOfficerInModalBtn.addEventListener('click', () => {
+          officerIdInput.value = '113iom20';
+          officerNameInput.value = 'Legal Metrology Officer';
+          officerPasswordInput.value = 'Officer@123';
+          officerEmailInput.value = 'officer@lmvs.gov';
+          officerPhoneInput.value = '011-2338-0000';
+          validateOfficerIdPrefix('113iom20');
         });
+      }
 
-        setSession(data.token, data.user);
-        showToast(`Welcome back, ${data.user.name}!`, 'success');
+      // Quick fill demo owner
+      document.getElementById('demoOwnerBtn').addEventListener('click', () => {
+        showLoginTab();
+        document.getElementById('loginIdentifier').value = '5432 1098 7654';
+        document.getElementById('loginPassword').value = 'Owner@123';
+        showToast('Prefilled Demo Machine Holder (Rajesh Sharma, Aadhaar: 5432 1098 7654)', 'info');
+      });
 
-        setTimeout(() => {
-          if (data.user.role === 'Officer') {
-            window.location.href = 'officer-dashboard.html';
-          } else {
-            window.location.href = 'owner-dashboard.html';
+      // Format Aadhaar input with spaces
+      const aadhaarInput = document.getElementById('regAadhaarNo');
+      if (aadhaarInput) {
+        aadhaarInput.addEventListener('input', (e) => {
+          let val = e.target.value.replace(/\D/g, '').substring(0, 12);
+          let formatted = '';
+          for (let i = 0; i < val.length; i++) {
+            if (i > 0 && i % 4 === 0) formatted += ' ';
+            formatted += val[i];
           }
-        }, 600);
-      } catch (err) {
-        showToast(err.message || 'Login failed', 'error');
-        btn.disabled = false;
-        btn.innerHTML = '<span>Sign In to Portal &rarr;</span>';
-      }
-    });
-
-    // Handle Register Submit
-    registerForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const name = document.getElementById('regName').value.trim();
-      const email = document.getElementById('regEmail').value.trim();
-      const phone = document.getElementById('regPhone').value.trim();
-      const shopName = document.getElementById('regShopName').value.trim();
-      const shopAddress = document.getElementById('regShopAddress').value.trim();
-      const password = document.getElementById('regPassword').value;
-      const btn = document.getElementById('regSubmitBtn');
-
-      btn.disabled = true;
-      btn.innerHTML = '<span class="animate-spin">⏳</span> Registering...';
-
-      try {
-        const data = await api('/api/auth/register', {
-          method: 'POST',
-          body: { name, email, phone, shopName, shopAddress, password },
+          e.target.value = formatted;
         });
-
-        setSession(data.token, data.user);
-        showToast('Business account registered successfully!', 'success');
-
-        setTimeout(() => {
-          window.location.href = 'owner-dashboard.html';
-        }, 600);
-      } catch (err) {
-        showToast(err.message || 'Registration failed', 'error');
-        btn.disabled = false;
-        btn.innerHTML = '<span>Create Business Account &rarr;</span>';
       }
+
+      // Handle Machine Holder Login Submit
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const identifier = document.getElementById('loginIdentifier').value.trim();
+        const password = document.getElementById('loginPassword').value;
+
+        // If an officer types their 113iom ID into the general login box, allow it!
+        if (identifier.toLowerCase().startsWith('113iom')) {
+          showToast('Officer ID detected. Authenticating officer credentials...', 'info');
+        }
+
+        try {
+          const res = await api('/api/auth/login', {
+            method: 'POST',
+            body: { identifier, password },
+          });
+
+          setSession(res.token, res.user);
+          showToast(`Welcome, ${res.user.name}!`, 'success');
+
+          setTimeout(() => {
+            if (res.user.role === 'Officer') {
+              window.location.href = 'officer-dashboard.html';
+            } else {
+              window.location.href = 'owner-dashboard.html';
+            }
+          }, 500);
+        } catch (err) {
+          showToast(err.message || 'Login failed. Please verify credentials.', 'error');
+        }
+      });
+
+      // Handle Machine Holder Registration Submit
+      registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('regName').value.trim();
+        const aadhaarNo = document.getElementById('regAadhaarNo').value.trim();
+        const phone = document.getElementById('regPhone').value.trim();
+        const shopName = document.getElementById('regShopName').value.trim();
+        const shopAddress = document.getElementById('regShopAddress').value.trim();
+        const email = document.getElementById('regEmail').value.trim();
+        const password = document.getElementById('regPassword').value;
+
+        const cleanAadhaar = aadhaarNo.replace(/\D/g, '');
+        if (cleanAadhaar.length !== 12) {
+          showToast('Please enter a valid 12-digit Aadhaar Number', 'warning');
+          return;
+        }
+
+        try {
+          const res = await api('/api/auth/register', {
+            method: 'POST',
+            body: {
+              name,
+              aadhaarNo,
+              phone,
+              shopName,
+              shopAddress,
+              email,
+              password,
+            },
+          });
+
+          setSession(res.token, res.user);
+          showToast(`Machine Holder account registered for ${name}!`, 'success');
+
+          setTimeout(() => {
+            window.location.href = 'owner-dashboard.html';
+          }, 600);
+        } catch (err) {
+          showToast(err.message || 'Registration failed.', 'error');
+        }
+      });
+
+      // Handle Officer Verification & Registration Submit
+      officerRegisterForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const idno = officerIdInput.value.trim();
+        const name = officerNameInput.value.trim();
+        const password = officerPasswordInput.value;
+        const phone = officerPhoneInput.value.trim();
+        const email = officerEmailInput.value.trim();
+
+        // STRICT VALIDATION: ID must start with 113iom
+        if (!validateOfficerIdPrefix(idno)) {
+          showToast("Access Denied: Officer ID must start with '113iom' (e.g. 113iom20, 113iom21).", "error");
+          officerIdInput.focus();
+          return;
+        }
+
+        const submitBtn = document.getElementById('submitOfficerBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span>Verifying Officer Credentials...</span>';
+
+        try {
+          // Attempt officer registration (or login if already registered)
+          let res;
+          try {
+            res = await api('/api/auth/officer-register', {
+              method: 'POST',
+              body: {
+                idno,
+                officerId: idno,
+                name,
+                password,
+                phone,
+                email,
+              },
+            });
+          } catch (regErr) {
+            // If already registered in MongoDB Atlas, authenticate via login
+            if (regErr.message && regErr.message.includes('already registered')) {
+              res = await api('/api/auth/login', {
+                method: 'POST',
+                body: { identifier: idno, password },
+              });
+            } else {
+              throw regErr;
+            }
+          }
+
+          setSession(res.token, res.user);
+          showToast(`Officer ID Verified! Welcome, ${res.user.name} (${idno})`, 'success');
+
+          setTimeout(() => {
+            window.location.href = 'officer-dashboard.html';
+          }, 600);
+        } catch (err) {
+          showToast(err.message || 'Officer verification failed.', 'error');
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span>Verify ID &amp; Access Officer Dashboard &rarr;</span>';
+        }
+      });
     });
   </script>
 </body>

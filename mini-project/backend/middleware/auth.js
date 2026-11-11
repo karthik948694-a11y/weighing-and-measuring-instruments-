@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const { users } = require('../services/dbStore');
 
 async function auth(req, res, next) {
   try {
@@ -8,8 +8,8 @@ async function auth(req, res, next) {
     if (!token) {
       return res.status(401).json({ message: 'Login required' });
     }
-    const payload = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(payload.id).select('-password');
+    const payload = jwt.verify(token, process.env.JWT_SECRET || 'lmvs-dev-secret-change-in-production-2026');
+    const user = await users.findById(payload.id);
     if (!user) {
       return res.status(401).json({ message: 'Account not found' });
     }

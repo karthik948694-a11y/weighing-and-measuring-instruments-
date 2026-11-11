@@ -1,37 +1,61 @@
 const mongoose = require('mongoose');
 
-let mongoServerInstance = null;
-
 async function connectDb() {
-  let uri = process.env.MONGODB_URI;
-  if (!uri || uri.includes('USERNAME:PASSWORD')) {
-    uri = 'mongodb://127.0.0.1:27017/lmvs';
+  const envUri = (process.env.MONGODB_URI || '').trim();
+  const uriLower = envUri.toLowerCase();
+  const isAtlas = uriLower.includes('mongodb+srv') || uriLower.includes('mongodb.net');
+  
+  const isPlaceholder = !envUri ||
+    uriLower.includes('<username>') ||
+    uriLower.includes('username') ||
+    uriLower.includes('<password>') ||
+    uriLower.includes('password') ||
+    uriLower.includes('xxxxx') ||
+    uriLower.includes('replace-with') ||
+    envUri.includes('127.0.0.1') ||
+    envUri.includes('localhost');
+
+  const isConfiguredAtlas = envUri && envUri.startsWith('mongodb') && !isPlaceholder;
+
+  if (isConfiguredAtlas) {
+    try {
+      console.log(`📡 Connecting to MongoDB Atlas Cloud Cluster (${envUri.split('@')[1] || 'Cluster'})...`);
+      await mongoose.connect(envUri, {
+        serverSelectionTimeoutMS: 4000,
+      });
+      console.log(`✅ [MongoDB Atlas] Connected successfully to MongoDB Atlas Cloud Cluster!`);
+      return true;
+    } catch (err) {
+      console.warn(`⚠️ [MongoDB Atlas] Connection attempt failed: ${err.message}`);
+    }
+  } else {
+    console.log('ℹ️ [MongoDB Atlas] Ready to connect! Paste your Atlas connection string in backend/.env:');
+    console.log('   MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/lmvs?retryWrites=true&w=majority');
   }
 
-  // 1. Attempt connection to configured URI with quick timeout
-  try {
-    console.log(`Attempting connection to MongoDB (${uri.includes('127.0.0.1') || uri.includes('localhost') ? 'Local' : 'Remote'})...`);
-    await mongoose.connect(uri, { serverSelectionTimeoutMS: 2000 });
-    console.log('Connected to MongoDB successfully!');
-    return;
-  } catch (err) {
-    console.warn(`Standard MongoDB connection unavailable (${err.message}).`);
+  // Attempt local MongoDB on 27017 if running
+  if (envUri.includes('127.0.0.1') || envUri.includes('localhost')) {
+    try {
+      await mongoose.connect(envUri, { serverSelectionTimeoutMS: 1000 });
+      console.log(`✅ [MongoDB Local] Connected to ${envUri}`);
+      return true;
+    } catch (_e) {
+      console.log('ℹ️ Local MongoDB daemon not active.');
+    }
   }
 
-  // 2. Fallback to embedded In-Memory MongoDB
+  console.log('⚡ Active Data Layer: In-Memory / File-based engine active. Data operations available immediately.');
+  return false;
+}
+
+async function disconnectDb() {
   try {
-    console.log('Starting In-Memory MongoDB Server (zero setup required)...');
-    const { MongoMemoryServer } = require('mongodb-memory-server');
-    mongoServerInstance = await MongoMemoryServer.create({
-      instance: { dbName: 'lmvs' }
-    });
-    const memUri = mongoServerInstance.getUri();
-    await mongoose.connect(memUri);
-    console.log(`Connected to In-Memory MongoDB at ${memUri}`);
-  } catch (memErr) {
-    console.error('Failed to start In-Memory MongoDB fallback:', memErr.message);
-    throw memErr;
+    if (mongoose.connection && mongoose.connection.readyState !== 0) {
+      await mongoose.disconnect();
+    }
+  } catch (_err) {
+    // Ignore disconnect error
   }
 }
 
-module.exports = { connectDb };
+module.exports = { connectDb, disconnectDb };

@@ -15,19 +15,33 @@ const storage = multer.diskStorage({
   },
 });
 
-function imageFilter(_req, file, cb) {
+function mediaFilter(_req, file, cb) {
   const isImageMime = file.mimetype && file.mimetype.startsWith('image/');
+  const isVideoMime = file.mimetype && file.mimetype.startsWith('video/');
   const isImageExt = /\.(jpg|jpeg|png|webp|gif|bmp|svg)$/i.test(file.originalname || '');
-  if (!isImageMime && !isImageExt) {
-    return cb(new Error('Only image files are allowed'));
+  const isVideoExt = /\.(mp4|webm|ogg|mov|m4v|mkv|avi|3gp)$/i.test(file.originalname || '');
+
+  if (isImageMime || isVideoMime || isImageExt || isVideoExt) {
+    return cb(null, true);
   }
-  cb(null, true);
+  return cb(new Error('Only photo image files and video files are permitted'));
 }
 
+// 50MB limit to comfortably allow short demonstration / calibration video clips
 const upload = multer({
   storage,
-  fileFilter: imageFilter,
-  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: mediaFilter,
+  // Limit uploads to 16 MB as per requirement
+  limits: { fileSize: 16 * 1024 * 1024 },
 });
 
-module.exports = { upload };
+// For application submission: handles both 'photo' and 'video'
+const uploadAppMedia = upload.fields([
+  { name: 'photo', maxCount: 1 },
+  { name: 'video', maxCount: 1 },
+]);
+
+module.exports = {
+  upload,
+  uploadAppMedia,
+};

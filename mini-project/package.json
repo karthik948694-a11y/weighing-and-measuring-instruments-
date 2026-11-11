@@ -1,0 +1,10 @@
+{
+  "name": "lmvs-mini-project",
+  "version": "1.0.0",
+  "description": "Legal Metrology Verification System (LMVS)",
+  "scripts": {
+    "start": "node backend/server.js",
+    "test": "node backend/test-suite.js"
+  }
+}
+
